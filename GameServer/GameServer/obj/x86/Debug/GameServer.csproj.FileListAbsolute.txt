@@ -1,0 +1,5 @@
+D:\University Work\Year 3\Multiplayer and Social\Game\GameServer\GameServer\obj\x86\Debug\GameServer.exe
+D:\University Work\Year 3\Multiplayer and Social\Game\GameServer\GameServer\bin\Debug\GameServer.exe
+D:\University Work\Year 3\Multiplayer and Social\Game\GameServer\GameServer\bin\Debug\GameServer.pdb
+D:\University Work\Year 3\Multiplayer and Social\Game\GameServer\GameServer\obj\x86\Debug\GameServer.csprojResolveAssemblyReference.cache
+D:\University Work\Year 3\Multiplayer and Social\Game\GameServer\GameServer\obj\x86\Debug\GameServer.pdb

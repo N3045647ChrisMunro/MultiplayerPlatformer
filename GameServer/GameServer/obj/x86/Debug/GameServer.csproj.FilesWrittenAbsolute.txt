@@ -1,0 +1,5 @@
+/Volumes/Home/Year 3/Multiplayer and Social/GameServer/GameServer/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/Volumes/Home/Year 3/Multiplayer and Social/GameServer/GameServer/bin/Debug/GameServer.exe.mdb
+/Volumes/Home/Year 3/Multiplayer and Social/GameServer/GameServer/bin/Debug/GameServer.exe
+/Volumes/Home/Year 3/Multiplayer and Social/GameServer/GameServer/obj/x86/Debug/GameServer.exe
+/Volumes/Home/Year 3/Multiplayer and Social/GameServer/GameServer/obj/x86/Debug/GameServer.exe.mdb
