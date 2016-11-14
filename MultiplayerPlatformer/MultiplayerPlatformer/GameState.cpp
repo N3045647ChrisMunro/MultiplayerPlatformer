@@ -60,8 +60,6 @@ bool GameState::createWorld()
 		tcpNetwork_.setIP_address(std::string("192.168.56.1"));
 		tcpNetwork_.setPortNumber(std::string("8080"));
 		tcpNetwork_.createSocket();
-		tcpNetwork_.connectToServer();
-		tcpNetwork_.sendData("Hello/n");
 
 		return true;
 	}
@@ -74,6 +72,10 @@ bool GameState::createWorld()
 
 void GameState::updateWorld()
 {
+
+	tcpNetwork_.connectToServer();
+	tcpNetwork_.sendData("Hello/n");
+
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
 
