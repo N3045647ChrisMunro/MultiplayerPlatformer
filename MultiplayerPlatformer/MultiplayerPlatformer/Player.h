@@ -1,10 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
-#include "Bullet.h"
 #include <string>
 #include <Box2D\Box2D.h>
+
 #include "Box.h"
+#include "Bullet.h"
 
 class Player : public sf::Drawable
 {
@@ -23,15 +24,20 @@ public:
 
 	bool canShoot() const { return canShoot_; };
 
+	const Box& getBox() const { return playerPhysicsBox_; }
+
 private:
 
-	void moveRight();
-	void moveLeft();
+	void moveRight(float deltaTime);
+	void moveLeft(float deltaTime);
+	
+	bool canJump_{ false };
 
 private:
 
 	b2World* world_{ nullptr };
 	Box playerPhysicsBox_;
+	b2Vec2 velocity_;
 
 	Bullet bullet_;
 
@@ -52,7 +58,7 @@ private:
 
 	sf::Clock clock_;
 
-	float moveSpeed_{ 0.1f }; // Player Movement speed
+	float moveSpeed_{ 300.0f }; // Player Movement speed
 	const int moveStep_{ 30 }; //Amount of pixels the player moves per key press
 
 	sf::Vector2f playerPos_{ 0, 0 };

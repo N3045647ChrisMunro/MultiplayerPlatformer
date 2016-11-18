@@ -70,7 +70,7 @@ void Bullet::setActive(bool newState)
 	isActive_ = newState;
 }
 
-void Bullet::update()
+void Bullet::update(float deltaTime)
 {
 	if (isActive_) {
 
@@ -80,8 +80,8 @@ void Bullet::update()
 		const float vX = speed_ * (targetPosition_.x - position_.x) / distance;
 		const float vY = speed_ * (targetPosition_.y - position_.y) / distance;
 
-		position_.x += vX;
-		position_.y += vY;
+		position_.x += vX * deltaTime;
+		position_.y += vY * deltaTime;
 
 
 		bSprite_.setPosition(position_.x, position_.y);

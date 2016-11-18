@@ -1,16 +1,2 @@
-﻿  Box.cpp
-  Bullet.cpp
-Bullet.cpp(44): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-Bullet.cpp(44): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
-  main.cpp
-main.cpp(22): warning C4305: 'argument': truncation from 'double' to 'float32'
-  Player.cpp
-Player.cpp(160): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-Player.cpp(167): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  Generating code
-  54 of 156 functions (34.6%) were compiled, the rest were copied from previous compilation.
-    50 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\VS\MultiplayerPlatformer\Release\MultiplayerPlatformer.exe
-  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\VS\MultiplayerPlatformer\Release\MultiplayerPlatformer.pdb (Full PDB)
+﻿  GameState.cpp
+GameState.cpp : fatal error C1041: cannot open program database 'D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\MultiplayerPlatformer\Release\vc140.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS

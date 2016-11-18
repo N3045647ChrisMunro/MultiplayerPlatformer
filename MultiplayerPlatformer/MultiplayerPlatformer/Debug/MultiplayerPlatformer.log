@@ -1,4 +1,3 @@
-﻿  GameState.cpp
-d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\gamestate.cpp(36): warning C4305: 'argument': truncation from 'double' to 'float32'
+﻿  Player.cpp
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.exe
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.pdb (Partial PDB)

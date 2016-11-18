@@ -20,13 +20,13 @@ public:
 	void setTargetPosition(sf::Vector2f targetPos);
 
 
-	void update();
+	void update(float deltaTime);
 
 private:
 
 	bool isActive_{ false };
 
-	float speed_{ 0.5f };
+	float speed_{ 2000.0f };
 
 	sf::Vector2f position_;
 	sf::Vector2f targetPosition_;

@@ -11,7 +11,7 @@ Box::~Box()
 {
 }
 
-void Box::init(b2World* world, const sf::Vector2f &position, const sf::Vector2f &dimensions)
+void Box::init(b2World* world, const sf::Vector2f &position, const sf::Vector2f &dimensions, bool fixedRotation)
 {
 
 	dimensions_ = dimensions;
@@ -20,7 +20,7 @@ void Box::init(b2World* world, const sf::Vector2f &position, const sf::Vector2f 
 	b2BodyDef bodyDef; 
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position.Set(position.x, position.y);
-
+	bodyDef.fixedRotation = fixedRotation; 
 	body_ = world->CreateBody(&bodyDef);
 
 	b2PolygonShape boxShape;

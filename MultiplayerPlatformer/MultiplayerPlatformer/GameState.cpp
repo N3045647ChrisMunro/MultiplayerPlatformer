@@ -38,28 +38,20 @@ bool GameState::createWorld()
 		world_ = std::make_unique<b2World>(gravity);
 
 		//Make Ground
-		groundBodyDef_.position.Set(0.0f, -10.f);
+		groundBodyDef_.position.Set(0.f, 0.f);
 		groundBody_ = world_->CreateBody(&groundBodyDef_);
 
 		//Make the ground fixture
-		groundBox_.SetAsBox(1280.0f, 500.0f);
+		groundBox_.SetAsBox(1280.f, 623.f);
 		groundBody_->CreateFixture(&groundBox_, 0.0f);
 
 		//Create / Initialize the Player
 		player_ = new Player(world_.get());
 		player_->createSprite();
 
-		Bullet bullet;
-
-		Box newBox;
-		newBox.init(world_.get(), sf::Vector2f(350.f, 100.f), sf::Vector2f(72.f, 97.f));
-
-		sf::RectangleShape myBox(newBox.getDimensions());
-		myBox.setFillColor(sf::Color::Red);
-
-		tcpNetwork_.setIP_address(std::string("192.168.56.1"));
-		tcpNetwork_.setPortNumber(std::string("8080"));
-		tcpNetwork_.createSocket();
+		//tcpNetwork_.setIP_address(std::string("192.168.56.1"));
+		//tcpNetwork_.setPortNumber(std::string("8080"));
+		//tcpNetwork_.createSocket();
 
 		return true;
 	}
@@ -73,11 +65,11 @@ bool GameState::createWorld()
 void GameState::updateWorld()
 {
 
-	tcpNetwork_.connectToServer();
-	tcpNetwork_.sendData("Hello/n");
+	//tcpNetwork_.connectToServer();
+	//tcpNetwork_.sendData("Hello/n");
 
 	// Create and start the receive thread
-	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
+	//std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
 
 	while (window_->isOpen())
 	{
@@ -104,7 +96,7 @@ void GameState::updateWorld()
 	}
 
 	//When the game window closes, join the threads back to the "main" thread
-	tcp_recvThread.join();
+	//tcp_recvThread.join();
 
 }
 
