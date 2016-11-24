@@ -1,2 +1,8 @@
-﻿  GameState.cpp
-GameState.cpp : fatal error C1041: cannot open program database 'D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\MultiplayerPlatformer\Release\vc140.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS
+﻿  Player.cpp
+  Generating code
+  1 of 177 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Release\MultiplayerPlatformer.exe
+  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Release\MultiplayerPlatformer.pdb (Full PDB)

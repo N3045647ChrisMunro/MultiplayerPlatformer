@@ -31,18 +31,18 @@ bool GameState::createWorld()
 	try {
 		//Create game Window
 		window_ = new sf::RenderWindow(sf::VideoMode(1280, 720), "SFML Test");
-
+		window_->setKeyRepeatEnabled(false);
 		//Create Physics World and Intialize with Gravity
-		b2Vec2 gravity(0.0f, -9.81);
+		b2Vec2 gravity(0.0f, 2.5f);
 
 		world_ = std::make_unique<b2World>(gravity);
 
 		//Make Ground
-		groundBodyDef_.position.Set(0.f, 0.f);
+		groundBodyDef_.position.Set(0.f, 700.f);
 		groundBody_ = world_->CreateBody(&groundBodyDef_);
 
 		//Make the ground fixture
-		groundBox_.SetAsBox(1280.f, 623.f);
+		groundBox_.SetAsBox(1280.f, 10.f);
 		groundBody_->CreateFixture(&groundBox_, 0.0f);
 
 		//Create / Initialize the Player
@@ -52,6 +52,8 @@ bool GameState::createWorld()
 		//tcpNetwork_.setIP_address(std::string("192.168.56.1"));
 		//tcpNetwork_.setPortNumber(std::string("8080"));
 		//tcpNetwork_.createSocket();
+
+		testBox.init(world_.get(), sf::Vector2f(200, 400), sf::Vector2f(20, 5.f), false);
 
 		return true;
 	}
@@ -71,9 +73,21 @@ void GameState::updateWorld()
 	// Create and start the receive thread
 	//std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
 
+	sf::RectangleShape ground(sf::Vector2f(1280.f, 20.f));
+	ground.setFillColor(sf::Color::Red);
+	ground.setPosition(sf::Vector2f(groundBody_->GetPosition().x, groundBody_->GetPosition().y));
+
+
+	sf::RectangleShape testBoxShape(sf::Vector2f(20.f, 10.f));
+	testBoxShape.setPosition(150, 10);
+	testBoxShape.setFillColor(sf::Color::Red);
+
 	while (window_->isOpen())
 	{
+		const sf::Time deltaTime = clock_.restart();
+		
 		sf::Event event;
+
 		while (window_->pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
@@ -81,16 +95,18 @@ void GameState::updateWorld()
 				window_->close();
 			}
 		}
-		
-		const sf::Time deltaTime = clock_.restart();
+	
+		world_->Step(1/60.f, 6, 2);
+
+		testBoxShape.setPosition(sf::Vector2f(testBox.getBody()->GetPosition().x, testBox.getBody()->GetPosition().y));
 
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
 
-		world_->Step(deltaTime.asSeconds(), 6, 2);
-
 		window_->clear(sf::Color(55, 236, 252));
 		window_->draw(*player_);
+		window_->draw(ground);
+		window_->draw(testBoxShape);
 
 		window_->display();
 	}

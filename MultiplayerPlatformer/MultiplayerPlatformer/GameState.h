@@ -13,11 +13,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <Box2D\Box2D.h>
 #include "TCPNetwork.hpp"
+#include "Box.h"
 
 
 //Forward Declaration of Game Classes
 class Player;
-
 
 class GameState
 {
@@ -48,6 +48,7 @@ private:
 	b2BodyDef groundBodyDef_;
 	b2Body* groundBody_{ nullptr };
 	b2PolygonShape groundBox_;
+	Box testBox;
 
 
 	//Gameplay Variables

@@ -63,10 +63,6 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 void Player::update(sf::Event event, float dt)
 {
-
-	//std::cout << "Y VEL: " << playerPhysicsBox_.getBody()->GetLinearVelocity().y << std::endl;
-	//std::cout << "Grav: " << world_->GetGravity().x << ", " << world_->GetGravity().y << std::endl;
-
 	//Shoot
 	if (canShoot_ == true && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		canShoot_ = false;
@@ -114,14 +110,24 @@ void Player::update(sf::Event event, float dt)
 		velocity_.x = 0;
 	}
 
-	////Jump
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-		action_ = true;
-		walking_ = false;
-		jumping_ = true;
+	//Jump
+	if (canJump_) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
 
-		actionsTileX_ = 2;
-		actionsTileY_ = 2;
+			//playerPhysicsBox_.getBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -500.f), true);
+
+			velocity_.x = playerPhysicsBox_.getBody()->GetLinearVelocity().x;
+			velocity_.y = -10;
+			playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
+
+			action_ = true;
+			walking_ = false;
+			jumping_ = true;
+			//canJump_ = false;
+
+			actionsTileX_ = 2;
+			actionsTileY_ = 2;
+		}
 	}
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Space) {
 		action_ = false;
@@ -164,6 +170,11 @@ void Player::update(sf::Event event, float dt)
 		walkTileY_ = 0;
 	}
 
+
+
+	//std::cout << playerPhysicsBox_.getBody()->GetLinearVelocity().x << ", " << playerPhysicsBox_.getBody()->GetLinearVelocity().y << std::endl;
+	//std::cout << velocity_.x << ", " << velocity_.y << std::endl;
+
 	//Loop through all contact points
 	auto playerBody = playerPhysicsBox_.getBody();
 	for (b2ContactEdge* ce = playerBody->GetContactList(); ce != nullptr; ce = ce->next) {
@@ -175,8 +186,12 @@ void Player::update(sf::Event event, float dt)
 
 			//Check if the contact point is below the player
 			for (int i = 0; i < b2_maxManifoldPoints; i++) {
-				if (manifold.points[i].y < playerBody->GetPosition().y - playerPhysicsBox_.getDimensions().y / 2.0 + 0.01f) {
+				if (manifold.points[i].y < playerBody->GetPosition().y - playerPhysicsBox_.getDimensions().y - 5.f) {
 					canJump_ = true;
+				}
+				else {
+					std::cout << "A" << std::endl;
+					canJump_ = false;
 				}
 			}
 		}
@@ -208,7 +223,8 @@ void Player::update(sf::Event event, float dt)
 	pWeapon_.setRotation(weaponRotationAngle_);
 
 	//Update physics and player position / physics box position
-	playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
+	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
+	//playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
 	pSprite_.setPosition(sf::Vector2f(playerPhysicsBox_.getBody()->GetPosition().x, playerPhysicsBox_.getBody()->GetPosition().y));
 	playerPos_.x = playerPhysicsBox_.getBody()->GetPosition().x;
 	playerPos_.y = playerPhysicsBox_.getBody()->GetPosition().y;
@@ -242,7 +258,9 @@ void Player::moveRight(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	velocity_.x = 300.f;
+	velocity_.x = 10.f;
+	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
+	playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
 
 	pSprite_.setPosition(playerPos_);
 
@@ -261,10 +279,12 @@ void Player::moveLeft(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	velocity_.x = -300.f;
-
+	velocity_.x = -10.f;
+	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
+	playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
+	
 	pSprite_.setPosition(playerPos_);
-
+	
 	pSprite_.setScale({ -1.f, 1.f }); //Flip the sprite to face left
 	pWeapon_.setScale({ -1.f, 1.f }); //Flip the Weapon Sprite to face left
 	pShield_.setScale({ -1.f, 1.f }); //Flip the Shield Sprite to face left
