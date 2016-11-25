@@ -53,6 +53,9 @@ namespace GameServer
                     Console.WriteLine("Listening For Connections");
                     TcpClient newClient = TCPlistener_.AcceptTcpClient();
 
+                    //Socket listener;
+                    //listener.BeginAccept(new AsyncCallback(AcceptCallBack), listener);
+
                     //Once a client is found start a thread to handle the client
                     Thread newThread = new Thread(new ParameterizedThreadStart(HandleClient));
                     newThread.Start(newClient);
@@ -60,7 +63,6 @@ namespace GameServer
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine("aids");
                     Console.WriteLine(e.Message);
                 }
 
@@ -99,6 +101,31 @@ namespace GameServer
                 Console.WriteLine(e.Message);
                 netStream.Close();
             }
+        }
+
+        public static void AcceptCallBack(IAsyncResult ar)
+        {
+            Socket listener = (Socket)ar.AsyncState;
+            Socket socket = listener.EndAccept(ar);
+
+            //StateObject state = new StateObject();
+            //state.workSocket = socket;
+            //socket.BeginReceive(state.buffer, 0, new AsyncCallback(ReadCallBack), 0, state);
+        }
+
+        public static void ReadCallBack(IAsyncResult ar)
+        {
+            //StateObject state = (StateObject)ar.AsyncState;
+            //Socket socket = state.workSocket;
+
+            //int bytesRead = socket.EndReceive(ar);
+
+            //if(bytesRead > 0){
+            //    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+            //    string content = state.sb.ToString();
+            //    char[] delimitors = { ':' };
+            //    String[] parts = content.Split(delimitors);
+            //}
         }
 
     }
