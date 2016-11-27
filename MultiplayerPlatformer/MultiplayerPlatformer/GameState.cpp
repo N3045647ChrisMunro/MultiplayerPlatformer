@@ -37,9 +37,9 @@ bool GameState::createWorld()
 		player_ = new Player();
 		player_->createSprite();
 
-		//tcpNetwork_.setIP_address(std::string("192.168.56.1"));
-		//tcpNetwork_.setPortNumber(std::string("8080"));
-		//tcpNetwork_.createSocket();
+		tcpNetwork_.setIP_address(std::string("192.168.56.1"));
+		tcpNetwork_.setPortNumber(std::string("8080"));
+		tcpNetwork_.createSocket();
 
 		return true;
 	}
@@ -53,11 +53,11 @@ bool GameState::createWorld()
 void GameState::updateWorld()
 {
 
-	//tcpNetwork_.connectToServer();
-	//tcpNetwork_.sendData("Hello/n");
+	tcpNetwork_.connectToServer();
+	tcpNetwork_.sendData("Hello/n");
 
 	// Create and start the receive thread
-	//std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
+	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
 
 	sf::RectangleShape ground(sf::Vector2f(1280.f, 20.f));
 	ground.setFillColor(sf::Color::Red);
@@ -92,7 +92,7 @@ void GameState::updateWorld()
 	}
 
 	//When the game window closes, join the threads back to the "main" thread
-	//tcp_recvThread.join();
+	tcp_recvThread.join();
 
 }
 
