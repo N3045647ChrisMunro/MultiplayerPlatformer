@@ -8,3 +8,5 @@ D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\Game
 D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Debug\GameServer.exe
 D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Debug\GameServer.pdb
 D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Debug\GameServer.csprojResolveAssemblyReference.cache
+C:\Users\Chris\Documents\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Debug\GameServer.exe
+C:\Users\Chris\Documents\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Debug\GameServer.pdb
