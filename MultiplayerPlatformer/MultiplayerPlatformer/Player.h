@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <string>
-#include <Box2D\Box2D.h>
 
 #include "Box.h"
 #include "Bullet.h"
@@ -10,7 +9,7 @@
 class Player : public sf::Drawable
 {
 public:
-	Player(b2World* world);
+	Player();
 	virtual ~Player();
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -24,20 +23,22 @@ public:
 
 	bool canShoot() const { return canShoot_; };
 
-	const Box& getBox() const { return playerPhysicsBox_; }
-
-private:
+	const Box& getBox() const { return playerCollisionBox_; }
 
 	void moveRight(float deltaTime);
 	void moveLeft(float deltaTime);
+	void jump(float deltaTime);
+	void fall();
+	bool isJumping() const { return jumping_; }
+	void setIsJumping(bool state);
+
+private:
 	
 	bool canJump_{ false };
 
 private:
 
-	b2World* world_{ nullptr };
-	Box playerPhysicsBox_;
-	b2Vec2 velocity_;
+	Box playerCollisionBox_;
 
 	Bullet bullet_;
 
@@ -60,6 +61,7 @@ private:
 
 	float moveSpeed_{ 300.0f }; // Player Movement speed
 	const int moveStep_{ 30 }; //Amount of pixels the player moves per key press
+	const float jumpHeight_{ 75.f }; //Amount of pixels the player jumps
 
 	sf::Vector2f playerPos_{ 0, 0 };
 	sf::Vector2i mousePos_{ 0, 0 };

@@ -11,7 +11,6 @@
 //Include Core Game Libraries
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <Box2D\Box2D.h>
 #include "TCPNetwork.hpp"
 #include "Box.h"
 
@@ -44,11 +43,10 @@ private:
 
 
 	//Game Physics Variables
-	std::unique_ptr<b2World> world_;
-	b2BodyDef groundBodyDef_;
-	b2Body* groundBody_{ nullptr };
-	b2PolygonShape groundBox_;
 	Box testBox;
+
+	const int groundHeight_{ 700 };
+	const float gravitySpeed_{ 0.3f };
 
 
 	//Gameplay Variables

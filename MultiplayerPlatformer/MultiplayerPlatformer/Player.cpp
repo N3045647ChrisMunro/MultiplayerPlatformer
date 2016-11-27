@@ -4,7 +4,7 @@
 
 
 
-Player::Player(b2World*  world) : world_(world)
+Player::Player()
 {
 	//ctor
 }
@@ -43,9 +43,6 @@ void Player::createSprite()
 	pShield_.setTexture(pShieldTexture_);
 	pShield_.setOrigin(0, 35);
 	pShield_.setPosition(playerPos_.x - 5, playerPos_.y + 15);
-
-	playerPhysicsBox_.init(world_, sf::Vector2f(playerPos_.x, playerPos_.y), sf::Vector2f(72.0f, 97.0f), true);
-	velocity_ = playerPhysicsBox_.getBody()->GetLinearVelocity();
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -88,6 +85,7 @@ void Player::update(sf::Event event, float dt)
 			canShoot_ = false;
 	}
 
+
 	//Walk Right
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && walking_ == true) {
 		moveRight(dt);
@@ -96,7 +94,6 @@ void Player::update(sf::Event event, float dt)
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::D) {
 		walkTileX_ = 3;
 		walkTileY_ = 1;
-		velocity_.x = 0;
 	}
 	//Walk Left
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && walking_ == true) {
@@ -106,29 +103,12 @@ void Player::update(sf::Event event, float dt)
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::A) {
 		walkTileX_ = 3;
 		walkTileY_ = 1;
-
-		velocity_.x = 0;
 	}
-
 	//Jump
-	if (canJump_) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-
-			//playerPhysicsBox_.getBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -500.f), true);
-
-			velocity_.x = playerPhysicsBox_.getBody()->GetLinearVelocity().x;
-			velocity_.y = -10;
-			playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
-
-			action_ = true;
-			walking_ = false;
-			jumping_ = true;
-			//canJump_ = false;
-
-			actionsTileX_ = 2;
-			actionsTileY_ = 2;
-		}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+		jump(dt);
 	}
+	//Reset to defualt "standing" position
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Space) {
 		action_ = false;
 		walking_ = true;
@@ -148,8 +128,6 @@ void Player::update(sf::Event event, float dt)
 
 		actionsTileX_ = 0;
 		actionsTileY_ = 2;
-
-		velocity_.x = 0;
 	}
 	//When Key is released allow movement again.
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::S) {
@@ -168,33 +146,6 @@ void Player::update(sf::Event event, float dt)
 
 	if (walkTileY_ > 1) {
 		walkTileY_ = 0;
-	}
-
-
-
-	//std::cout << playerPhysicsBox_.getBody()->GetLinearVelocity().x << ", " << playerPhysicsBox_.getBody()->GetLinearVelocity().y << std::endl;
-	//std::cout << velocity_.x << ", " << velocity_.y << std::endl;
-
-	//Loop through all contact points
-	auto playerBody = playerPhysicsBox_.getBody();
-	for (b2ContactEdge* ce = playerBody->GetContactList(); ce != nullptr; ce = ce->next) {
-		b2Contact* c = ce->contact;
-		
-		if (c->IsTouching()) {
-			b2WorldManifold manifold;
-			c->GetWorldManifold(&manifold);
-
-			//Check if the contact point is below the player
-			for (int i = 0; i < b2_maxManifoldPoints; i++) {
-				if (manifold.points[i].y < playerBody->GetPosition().y - playerPhysicsBox_.getDimensions().y - 5.f) {
-					canJump_ = true;
-				}
-				else {
-					std::cout << "A" << std::endl;
-					canJump_ = false;
-				}
-			}
-		}
 	}
 
 	//Update Weaapon rotation based on mouse position
@@ -221,13 +172,7 @@ void Player::update(sf::Event event, float dt)
 
 	//Apply The rotation to the weapon
 	pWeapon_.setRotation(weaponRotationAngle_);
-
-	//Update physics and player position / physics box position
-	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
-	//playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
-	pSprite_.setPosition(sf::Vector2f(playerPhysicsBox_.getBody()->GetPosition().x, playerPhysicsBox_.getBody()->GetPosition().y));
-	playerPos_.x = playerPhysicsBox_.getBody()->GetPosition().x;
-	playerPos_.y = playerPhysicsBox_.getBody()->GetPosition().y;
+	playerPos_ = pSprite_.getPosition();
 
 	//Set Weapon position
 	if (facingRight_)
@@ -250,6 +195,41 @@ void Player::setMousePosition(sf::Vector2i mousePos)
 	mousePos_ = mousePos;
 }
 
+void Player::jump(float deltaTime)
+{
+	jumping_ = true;
+	action_ = true;
+	walking_ = false;
+
+	actionsTileX_ = 2;
+	actionsTileY_ = 2;
+
+	//pSprite_.move(0, -75.0f);
+
+	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x, playerPos_.y - jumpHeight_);
+
+	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
+								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
+
+	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
+	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
+
+	playerPos_.x += vX * deltaTime;
+	playerPos_.y += vY * deltaTime;
+
+	pSprite_.setPosition(playerPos_);
+}
+
+void Player::fall()
+{
+	pSprite_.move(0, 0.3);
+}
+
+void Player::setIsJumping(bool state)
+{
+	jumping_ = state;
+}
+
 void Player::moveRight(float deltaTime)
 {
 	walking_ = true;
@@ -258,9 +238,16 @@ void Player::moveRight(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	velocity_.x = 10.f;
-	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
-	playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
+	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x + moveStep_, playerPos_.y);
+
+	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
+								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
+
+	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
+	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
+
+	playerPos_.x += vX * deltaTime;
+	playerPos_.y += vY * deltaTime;
 
 	pSprite_.setPosition(playerPos_);
 
@@ -268,7 +255,7 @@ void Player::moveRight(float deltaTime)
 	pWeapon_.setScale({ 1.f, 1.f }); //Flip the Weapon Sprite to face right
 	pShield_.setScale({ 1.f, 1.f }); //Flip the Shield Sprite to face right
 
-	walkTileX_++;
+	//walkTileX_++;
 }
 
 void Player::moveLeft(float deltaTime)
@@ -279,15 +266,22 @@ void Player::moveLeft(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	velocity_.x = -10.f;
-	velocity_.y = playerPhysicsBox_.getBody()->GetLinearVelocity().y;
-	playerPhysicsBox_.getBody()->SetLinearVelocity(velocity_);
-	
+	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x - moveStep_, playerPos_.y);
+
+	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
+								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
+
+	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
+	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
+
+	playerPos_.x += vX * deltaTime;
+	playerPos_.y += vY * deltaTime;
+
 	pSprite_.setPosition(playerPos_);
 	
 	pSprite_.setScale({ -1.f, 1.f }); //Flip the sprite to face left
 	pWeapon_.setScale({ -1.f, 1.f }); //Flip the Weapon Sprite to face left
 	pShield_.setScale({ -1.f, 1.f }); //Flip the Shield Sprite to face left
 
-	walkTileX_++;
+	//walkTileX_++;
 }
