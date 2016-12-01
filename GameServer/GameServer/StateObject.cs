@@ -23,4 +23,10 @@ namespace GameServer
         public StringBuilder sb = new StringBuilder();
 
     }
+
+    class UdpState
+    {
+        public IPEndPoint e;
+        public UdpClient u;
+    }
 }

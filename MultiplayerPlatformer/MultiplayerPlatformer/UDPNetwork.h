@@ -44,10 +44,18 @@ private:
 	std::string ip_;
 	int port_;
 
+	char recvBuff_[1024];
+
+//#ifdef __APPLE__
+	//struct sockaddr_in  si_other_;
+	//int socket_, slen = sizeof(si_other_), recv_len;
+
+//#elif _WIN32
+
 	struct sockaddr_in si_other_;
 	int socket_, slen_ = sizeof(si_other_);
 
-	char recvBuff_[1024];
+//#endif // __APPLE__
 
 };
 

@@ -51,10 +51,21 @@ void UDPNetwork::createSocket()
 {
 #ifdef  __APPLE__
 
-	sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
+	ZeroMemory(&si_other_, sizeof(si_other_));
 
-	if (sockfd_ < 0)
+	//Setup address structure
+	si_me_.sin_family = AF_INET;
+	si_me_.sin_port = htons(port_);
+
+	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+	if (socket_ < 0)
 		std::cerr << "Error: Failed to Create Socket" << std::endl;
+
+	if (inet_aton(ip_.c_str(), &si_other_.sin_addr) == 0)
+	{
+		std::cerr << "Error: inet_aton() failed" << std::endl;
+	}
 
 #elif _WIN32
 
@@ -78,6 +89,7 @@ void UDPNetwork::createSocket()
 
 void UDPNetwork::receiveData()
 {
+
 	std::cout << "Listeng for udp data..." << std::endl;
 	int s = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &si_other_, &slen_);
 	if (s > 0) {

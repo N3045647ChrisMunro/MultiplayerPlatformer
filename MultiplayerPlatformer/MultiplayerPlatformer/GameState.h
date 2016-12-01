@@ -50,7 +50,7 @@ private:
 	sf::Clock clock_;
 	
 	//Network Variables
-	TCPNetwork tcpNetwork_;
+	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
 
 	//Game Physics Variables
