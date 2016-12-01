@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <Box2D/Box2D.h>
 #include <string>
 
 #include "Box.h"
@@ -15,7 +16,7 @@ public:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void update(sf::Event event, float dt);
 
-	void createSprite();
+	void createSprite(b2World *world);
 
 	void setMousePosition(sf::Vector2i mousePos);
 
@@ -23,14 +24,14 @@ public:
 
 	bool canShoot() const { return canShoot_; };
 
-	const Box& getBox() const { return playerCollisionBox_; }
+	const Box& getCollisionBox() const { return playerCollisionBox_; }
 
 	void moveRight(float deltaTime);
 	void moveLeft(float deltaTime);
 	void jump(float deltaTime);
-	void fall();
 	bool isJumping() const { return jumping_; }
 	void setIsJumping(bool state);
+	bool isOnPlatform() const { return onPlatform_; }
 
 private:
 	
@@ -44,6 +45,9 @@ private:
 
 	sf::Sprite pSprite_;
 	sf::Texture pTexture_;
+	sf::RectangleShape colBox_;
+	const int frameWidth_{ 72 };
+	const int frameHeight_{ 97 };
 
 	sf::Sprite pWeapon_;
 	sf::Texture pWeaponTexture_;
@@ -58,10 +62,14 @@ private:
 	unsigned int actionsTileY_{ 0 };
 
 	sf::Clock clock_;
+	float currentTime_{ 0 };
 
 	float moveSpeed_{ 300.0f }; // Player Movement speed
-	const int moveStep_{ 30 }; //Amount of pixels the player moves per key press
+	b2Vec2 velocity_{ 0.f, 0.f }; //Player Velocity
+	const int moveStep_{ 1 }; //Amount of pixels the player moves per key press
 	const float jumpHeight_{ 75.f }; //Amount of pixels the player jumps
+
+	bool onPlatform_{ false };
 
 	sf::Vector2f playerPos_{ 0, 0 };
 	sf::Vector2i mousePos_{ 0, 0 };

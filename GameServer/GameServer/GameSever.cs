@@ -127,6 +127,8 @@ namespace GameServer
             //Signal the main thread to continue
             allDone.Set();
 
+            Console.WriteLine("Handling Client...");
+
             Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 

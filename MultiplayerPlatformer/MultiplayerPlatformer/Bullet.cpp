@@ -2,8 +2,9 @@
 #include <iostream>
 #include <math.h>
 
+#define PPM 30.f
 
-Bullet::Bullet()
+Bullet::Bullet(b2World *world)
 {
 	if (!bTexture_.loadFromFile("Resources/purpleLaser.png"))
 		std::cerr << "Bullet Texture Load Error" << std::endl;
@@ -12,7 +13,17 @@ Bullet::Bullet()
 		std::cerr << "Bullet Hit Texture Load Error" << std::endl;
 
 	bSprite_.setTexture(bTexture_);
-	bSprite_.setOrigin(17.5f, 7.5f);
+	dimensions_ = sf::Vector2f(bTexture_.getSize());
+	bSprite_.setOrigin(dimensions_.x / 2, dimensions_.y / 2);
+
+	shape_ = sf::RectangleShape(sf::Vector2f(dimensions_.x, dimensions_.y));
+	shape_.setOrigin(dimensions_.x / 2.f, dimensions_.y / 2);
+	shape_.setFillColor(sf::Color::Transparent);
+	shape_.setOutlineColor(sf::Color::Red);
+	shape_.setOutlineThickness(1.0);
+
+	world_ = world;
+
 }
 
 Bullet::~Bullet()
@@ -48,26 +59,18 @@ void Bullet::spawnBullet(sf::Vector2f spawnPos, sf::Vector2f targetPos, bool isF
 	//Set the texture for sanity reasons
 	bSprite_.setTexture(bTexture_);
 
+	//collisionBox_.init(world_, b2Vec2(position_.x / PPM, position_.y / PPM), 
+	//				   b2Vec2(dimensions_.x / PPM, dimensions_.y / PPM), false);
+	//collisionBox_.getBody()->SetBullet(true);
+
+	//velocity_ = collisionBox_.getBody()->GetLinearVelocity();
+
 }
 
 void Bullet::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(bSprite_, states);
-}
-
-void Bullet::setTargetPosition(sf::Vector2f targetPos)
-{
-	targetPosition_ = targetPos;
-}
-
-void Bullet::setPosition(sf::Vector2f position)
-{
-	position_ = position;
-}
-
-void Bullet::setActive(bool newState)
-{
-	isActive_ = newState;
+	target.draw(shape_, states);
 }
 
 void Bullet::update(float deltaTime)
@@ -83,16 +86,23 @@ void Bullet::update(float deltaTime)
 		position_.x += vX * deltaTime;
 		position_.y += vY * deltaTime;
 
-
 		bSprite_.setPosition(position_.x, position_.y);
-
-		const float cX = fabsf(targetPosition_.x - position_.x);
-		const float cY = fabsf(targetPosition_.y - position_.y);
-
-		if (cX < 10 && cY < 10) {
-			bSprite_.setTexture(bHitTexture_);
-			isActive_ = false;
-
-		}
+		shape_.setPosition(position_.x, position_.y);
+		shape_.setRotation(bSprite_.getRotation());
 	}
+}
+
+void Bullet::setTargetPosition(sf::Vector2f targetPos)
+{
+	targetPosition_ = targetPos;
+}
+
+void Bullet::setPosition(sf::Vector2f position)
+{
+	position_ = position;
+}
+
+void Bullet::setActive(bool newState)
+{
+	isActive_ = newState;
 }

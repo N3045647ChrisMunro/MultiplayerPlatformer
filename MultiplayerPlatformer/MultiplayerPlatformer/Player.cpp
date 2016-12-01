@@ -2,7 +2,7 @@
 #include <iostream>
 #include <math.h>
 
-
+#define PPM 30.f
 
 Player::Player()
 {
@@ -14,8 +14,9 @@ Player::~Player()
 	//dtor
 }
 
-void Player::createSprite()
+void Player::createSprite(b2World *world)
 {
+	//Load in all the textures
 	if (!pTexture_.loadFromFile("Resources/Player.png")) {
 		std::cerr << "Player Texture Load Error" << std::endl;
 	}
@@ -28,44 +29,68 @@ void Player::createSprite()
 		std::cerr << "Player Shield Texture Load Error" << std::endl;
 	}
 
-	pSprite_.setTextureRect(sf::IntRect(walkTileX_ * 72, walkTileX_ * 97, 72, 97));
-	pSprite_.setOrigin(36, 48.5);
+	// Set the frame within the Tileset
+	pSprite_.setTextureRect(sf::IntRect(walkTileX_ * frameWidth_, walkTileX_ * frameHeight_,
+										frameWidth_, frameHeight_));
+	pSprite_.setOrigin(frameWidth_ / 2, frameHeight_ / 2);
 	pSprite_.setTexture(pTexture_);
 
-	playerPos_ = sf::Vector2f(200, 200);
+	playerPos_ = sf::Vector2f(700, 0);
 
 	pSprite_.setPosition(playerPos_.x, playerPos_.y);
 
+	//create the players collision box
+	playerCollisionBox_.init(world, b2Vec2(playerPos_.x / PPM, playerPos_.y / PPM), b2Vec2(frameWidth_ / PPM, frameHeight_ / PPM), true);
+
+	//Draw the collision box outline
+	colBox_ = sf::RectangleShape(sf::Vector2f(frameWidth_, frameHeight_));
+	colBox_.setOrigin(frameWidth_ / 2, frameHeight_ / 2);
+	colBox_.setFillColor(sf::Color::Transparent);
+	colBox_.setOutlineColor(sf::Color::Red);
+	colBox_.setOutlineThickness(1.0);
+
+	// Set Weapon 
 	pWeapon_.setTexture(pWeaponTexture_);
 	pWeapon_.setOrigin(0, 16);
 	pWeapon_.setPosition(playerPos_.x + 22, playerPos_.y + 22);
 
+	// Set Shield;
 	pShield_.setTexture(pShieldTexture_);
 	pShield_.setOrigin(0, 35);
 	pShield_.setPosition(playerPos_.x - 5, playerPos_.y + 15);
+
+	//Create Bullets
+	bullet_ = Bullet(world);
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+	if (shooting_) {
+		if (bullet_.isActive())
+			bullet_.draw(target, states);
+		target.draw(pWeapon_, states);
+	}
+
+	target.draw(colBox_, states);
 	target.draw(pSprite_, states);
 
-	if (shooting_) {
-		target.draw(pWeapon_, states);
-		if (bullet_.isActive())
-			target.draw(bullet_.getSprite(), states);
-	}
-	else if (blocking_)
+	if (blocking_)
 		target.draw(pShield_, states);
+
 }
 
 void Player::update(sf::Event event, float dt)
 {
+
+	//Set Initial Velocity
+	velocity_ = playerCollisionBox_.getBody()->GetLinearVelocity();
+
 	//Shoot
 	if (canShoot_ == true && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		canShoot_ = false;
 
 		//Check to see which direction the player is facing, so the bullet spawn offset position can be set
-		if(facingRight_ == true && facingLeft_ == false)
+		if (facingRight_ == true && facingLeft_ == false)
 			bullet_.spawnBullet((sf::Vector2f)pSprite_.getPosition(), (sf::Vector2f)mousePos_, true);
 		else
 			bullet_.spawnBullet((sf::Vector2f)pSprite_.getPosition(), (sf::Vector2f)mousePos_, false);
@@ -73,11 +98,11 @@ void Player::update(sf::Event event, float dt)
 
 	bullet_.update(dt);
 	//Reset the cooldown
-	float timeNow = clock_.getElapsedTime().asSeconds();
+	currentTime_ = clock_.getElapsedTime().asSeconds();
 
 	if (canShoot_ == false) {
-		if (timeNow - lastTimeCheck_ > shootCooldown_) {
-			lastTimeCheck_ = timeNow;
+		if (currentTime_ - lastTimeCheck_ > shootCooldown_) {
+			lastTimeCheck_ = currentTime_;
 
 			canShoot_ = true;
 		}
@@ -85,15 +110,16 @@ void Player::update(sf::Event event, float dt)
 			canShoot_ = false;
 	}
 
-
 	//Walk Right
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && walking_ == true) {
-		moveRight(dt);
+		moveRight(dt);					
 	}
 	//Reset to defualt "standing" position
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::D) {
 		walkTileX_ = 3;
 		walkTileY_ = 1;
+
+		velocity_.x = 0;
 	}
 	//Walk Left
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && walking_ == true) {
@@ -103,6 +129,8 @@ void Player::update(sf::Event event, float dt)
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::A) {
 		walkTileX_ = 3;
 		walkTileY_ = 1;
+
+		velocity_.x = 0;
 	}
 	//Jump
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -120,6 +148,7 @@ void Player::update(sf::Event event, float dt)
 	//Crouch/Block, disable movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		action_ = true;
+		onPlatform_ = false;
 		walking_ = false;
 		jumping_ = false;
 
@@ -132,6 +161,7 @@ void Player::update(sf::Event event, float dt)
 	//When Key is released allow movement again.
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::S) {
 		action_ = false;
+		onPlatform_ = false;
 		walking_ = true;
 		jumping_ = false;
 
@@ -147,6 +177,19 @@ void Player::update(sf::Event event, float dt)
 	if (walkTileY_ > 1) {
 		walkTileY_ = 0;
 	}
+
+	//Update player velocity and positions
+
+	//Cap max Y velocity
+	//if (velocity_.y <= -10)
+		//velocity_.y = -10;
+
+	playerPos_.x = playerCollisionBox_.getBody()->GetPosition().x * PPM; //dt * velocity_.x;
+	playerPos_.y = playerCollisionBox_.getBody()->GetPosition().y * PPM; //dt * velocity_.y;
+	pSprite_.setPosition(playerPos_);
+	colBox_.setPosition(playerPos_);
+	playerCollisionBox_.getBody()->SetLinearVelocity(b2Vec2(velocity_.x, velocity_.y));
+
 
 	//Update Weaapon rotation based on mouse position
 	if (mousePos_.x > pWeapon_.getPosition().x) {
@@ -204,25 +247,9 @@ void Player::jump(float deltaTime)
 	actionsTileX_ = 2;
 	actionsTileY_ = 2;
 
-	//pSprite_.move(0, -75.0f);
-
-	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x, playerPos_.y - jumpHeight_);
-
-	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
-								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
-
-	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
-	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
-
-	playerPos_.x += vX * deltaTime;
-	playerPos_.y += vY * deltaTime;
+	velocity_.y = -10;
 
 	pSprite_.setPosition(playerPos_);
-}
-
-void Player::fall()
-{
-	pSprite_.move(0, 0.3);
 }
 
 void Player::setIsJumping(bool state)
@@ -238,24 +265,13 @@ void Player::moveRight(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x + moveStep_, playerPos_.y);
-
-	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
-								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
-
-	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
-	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
-
-	playerPos_.x += vX * deltaTime;
-	playerPos_.y += vY * deltaTime;
-
-	pSprite_.setPosition(playerPos_);
+	velocity_.x = 10;
 
 	pSprite_.setScale({ 1.f, 1.f }); //Flip the sprite to face right
 	pWeapon_.setScale({ 1.f, 1.f }); //Flip the Weapon Sprite to face right
 	pShield_.setScale({ 1.f, 1.f }); //Flip the Shield Sprite to face right
 
-	//walkTileX_++;
+	walkTileX_++;
 }
 
 void Player::moveLeft(float deltaTime)
@@ -266,22 +282,11 @@ void Player::moveLeft(float deltaTime)
 	action_ = false;
 	jumping_ = false;
 
-	sf::Vector2f targetPosition = sf::Vector2f(playerPos_.x - moveStep_, playerPos_.y);
+	velocity_.x = -10;
 
-	const float distance = sqrtf((targetPosition.x - playerPos_.x) * (targetPosition.x - playerPos_.x) +
-								(targetPosition.y - playerPos_.y) * (targetPosition.y - playerPos_.y));
-
-	const float vX = moveSpeed_ * (targetPosition.x - playerPos_.x) / distance;
-	const float vY = moveSpeed_ * (targetPosition.y - playerPos_.y) / distance;
-
-	playerPos_.x += vX * deltaTime;
-	playerPos_.y += vY * deltaTime;
-
-	pSprite_.setPosition(playerPos_);
-	
 	pSprite_.setScale({ -1.f, 1.f }); //Flip the sprite to face left
 	pWeapon_.setScale({ -1.f, 1.f }); //Flip the Weapon Sprite to face left
 	pShield_.setScale({ -1.f, 1.f }); //Flip the Shield Sprite to face left
 
-	//walkTileX_++;
+	walkTileX_++;
 }

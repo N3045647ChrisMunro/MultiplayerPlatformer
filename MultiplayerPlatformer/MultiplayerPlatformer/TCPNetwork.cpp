@@ -24,8 +24,8 @@ TCPNetwork::TCPNetwork()
 	sockfd_ = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (sockfd_ != 0) {
 		std::cerr << "Error: WSAStartup Failed: " << sockfd_ << std::endl;
-	return;
-}
+		return;
+	}
 
 #endif
 }
