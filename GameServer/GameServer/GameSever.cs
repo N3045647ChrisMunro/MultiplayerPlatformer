@@ -14,7 +14,8 @@ namespace GameServer
     {
 
         //Private Server/TCP variables
-        private Socket listener_;
+        private Socket TCPlistener_;
+        private Socket UDPListener_;
 
         //private TcpListener TCPlistener_;
         private static int serverPortNumber_;
@@ -46,18 +47,17 @@ namespace GameServer
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 IPEndPoint localEndPoint = new IPEndPoint(ipAddress, serverPortNumber_);
 
-                listener_ = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                TCPlistener_ = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                listener_.Bind(localEndPoint);
+                TCPlistener_.Bind(localEndPoint);
                 
-
                 isRunning_ = true;
                 AcceptLoop();
             }
             catch(SocketException se)
             {
                 Console.WriteLine(se.ErrorCode + ": " + se.Message);
-                Environment.Exit(se.ErrorCode);
+                //Environment.Exit(se.ErrorCode);
             }
 
         }
@@ -73,10 +73,16 @@ namespace GameServer
                     allDone.Reset();
 
                     Console.WriteLine("Listening For Connections");
-                    //TcpClient newClient = TCPlistener_.AcceptTcpClient();
-                    listener_.Listen(100);
 
-                    listener_.BeginAccept(new AsyncCallback(AcceptCallBack), listener_);
+
+                    UdpClient udpClient = new UdpClient(8081);
+                    //ReceiveMessages();
+                    udpClient.BeginReceive(new AsyncCallback(RecvCallBack), udpClient);
+
+                    //TcpClient newClient = TCPlistener_.AcceptTcpClient();
+                    TCPlistener_.Listen(100);
+
+                    TCPlistener_.BeginAccept(new AsyncCallback(AcceptCallBack), TCPlistener_);
 
                     //Wait until a connection is made before continuing.
                     allDone.WaitOne();
@@ -108,9 +114,9 @@ namespace GameServer
             state.workSocket = handler;
             handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
 
-            UdpState udpState = new UdpState();
-            udpState.u = (UdpClient)ar.AsyncState;
-            udpState.u.BeginReceive(new AsyncCallback(RecvCallBack), udpState);
+            //UdpClient udpClient = new UdpClient();
+            //UdpState udpState = new UdpState();
+            //udpClient.BeginReceive(new AsyncCallback(RecvCallBack), udpState);
 
         }
 
@@ -174,6 +180,7 @@ namespace GameServer
 
         public static void RecvCallBack(IAsyncResult ar)
         {
+            Console.WriteLine("HelloWorld");
             UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).u;
             IPEndPoint e = (IPEndPoint)((UdpState)(ar.AsyncState)).e;
 

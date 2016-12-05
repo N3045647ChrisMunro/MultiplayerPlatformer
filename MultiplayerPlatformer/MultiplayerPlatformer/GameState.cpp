@@ -43,14 +43,17 @@ bool GameState::createWorld()
 		player_->createSprite(world_);
 
 		tcpNetwork_ = new TCPNetwork();
-		tcpNetwork_->setIP_address(std::string("192.168.224.1"));
+		tcpNetwork_->setIP_address(std::string("192.168.170.1"));
 		tcpNetwork_->setPortNumber(std::string("8080"));
 		tcpNetwork_->createSocket();
 
+		tcpNetwork_->connectToServer();
+		tcpNetwork_->sendData("Hello");
+
 		//udpNetwork_.setIP_address(std::string("192.168.56.1"));
-		//udpNetwork_.setPortNumber(8080);
-		//udpNetwork_.createSocket();
-		//udpNetwork_.sendData("Hello UDP");
+		udpNetwork_.setPortNumber(8081);
+		udpNetwork_.createSocket();
+		udpNetwork_.sendData("Hello UDP");
 
 		return true;
 	}
@@ -64,11 +67,9 @@ bool GameState::createWorld()
 void GameState::updateWorld()
 {
 
-	tcpNetwork_->connectToServer();
-	tcpNetwork_->sendData("Hello");
 
 	// Create and start the receive thread
-	//std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
+	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
 	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	//TODO: Remove this 
@@ -131,7 +132,7 @@ void GameState::updateWorld()
 	}
 
 	//When the game window closes, join the threads back to the "main" thread
-	//tcp_recvThread.join();
+	tcp_recvThread.join();
 	//udp_recvThread.join();
 }
 

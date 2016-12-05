@@ -1,21 +1,27 @@
 //
 //  UDPNetwork.hpp
-//  Multiplayer Platformer
+//  PlatformerGame
 //
-//  Created by MUNRO, CHRISTOPHER on 01/12/2016.
+//  Created by MUNRO, CHRISTOPHER on 02/12/2016.
 //  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
-#pragma once
+#ifndef UDPNetwork_hpp
+#define UDPNetwork_hpp
 
 #include <stdio.h>
 #include <string.h>
 
 #ifdef __APPLE__
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 #elif _WIN32
 
@@ -46,16 +52,23 @@ private:
 
 	char recvBuff_[1024];
 
-//#ifdef __APPLE__
-	//struct sockaddr_in  si_other_;
-	//int socket_, slen = sizeof(si_other_), recv_len;
+#ifdef __APPLE__
+	struct sockaddr_in ser_addr_;
+	struct hostent *server_;
+	int socket_, serlen_ = sizeof(ser_addr_), recv_len;
 
-//#elif _WIN32
+	char *hostname_;
 
-	struct sockaddr_in si_other_;
-	int socket_, slen_ = sizeof(si_other_);
+#elif _WIN32
 
-//#endif // __APPLE__
+	struct sockaddr_in local_, dest_;
+
+	SOCKET socket_ = INVALID_SOCKET;
+
+#endif // __APPLE__
 
 };
+
+
+#endif /* UDPNetwork_hpp */
 
