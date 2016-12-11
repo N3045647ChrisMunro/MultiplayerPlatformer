@@ -51,40 +51,47 @@ void UDPNetwork::createSocket()
 {
 #ifdef  __APPLE__
 
-	//ZeroMemory(&si_other_, sizeof(si_other_));
-
 	//Setup address structure
 	ser_addr_.sin_family = AF_INET;
 	ser_addr_.sin_port = htons(port_);
 
 	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+	const int trueValue = 1;
+	setsockopt(socket_, SOL_SOCKET, SO_REUSEPORT, &trueValue, sizeof(trueValue));
+
 	if (socket_ < 0)
 		std::cerr << "Error: Failed to Create Socket" << std::endl;
 
+	//if(bind(socket_, (struct sockaddr *)&ser_addr_, sizeof(ser_addr_) ) < 0)
+	//    std::cerr << "Error: Failed to Bind the Socket" << std::endl;
+
 #elif _WIN32
 
-	ZeroMemory(&local_, sizeof(local_));
+	ZeroMemory(&recvAddr_, sizeof(recvAddr_));
 
 	//Setup address structure
-	local_.sin_family = AF_INET;
-	local_.sin_port = htons(port_);
-	local_.sin_addr.s_addr = inet_addr(ip_.c_str());
-
-	dest_.sin_family = AF_INET;
-	dest_.sin_addr.s_addr = inet_addr(ip_.c_str());
-	dest_.sin_port = htons(port_);
+	recvAddr_.sin_family = AF_INET;
+	recvAddr_.sin_port = htons(port_);
+	recvAddr_.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 
 	//Create a SOCKET for connecting to server
 	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	const bool trueValue = true;
+	socket_ = setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char *)&trueValue, sizeof(bool));
 
 	if (socket_ == INVALID_SOCKET) {
 		std::cerr << "Error: Invalid Socket: " << WSAGetLastError() << std::endl;
 		WSACleanup();
 	}
 
-	//Bind the socket to the local address
-	bind(socket_, (sockaddr *)&local_, sizeof(local_));
+	//int result = bind(socket_, (SOCKADDR *)&recvAddr_, sizeof(recvAddr_));
+
+	//std::cout << "UDP RESULT: " << result << std::endl;
+
+	//if (result != 0) {
+	//	std::cerr << "Error: UDP Socket Bind Failed with Error: " << WSAGetLastError() << std::endl;
+	//}
 
 #endif //  __APPLE__
 }
@@ -93,32 +100,31 @@ void UDPNetwork::receiveData()
 {
 #ifdef __APPLE__
 
+	std::cout << "Listening for UDP data...." << std::endl;
+
 	int s = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
-	//recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &si_other_, &slen_);
+	//int s = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &ser_addr_, (unsigned int *)(&ser_addr_));
 
-	if (s > 0) {
-		std::cout << "Received: " << socket_ << "BYTES" << std::endl;
-		std::cout << "Received: " << recvBuff_ << std::endl;
+	if (s < 0) {
+		std::cerr << "Error: UDP Read Error" << s << std::endl;
 	}
-	else if (s == 0)
-		std::cerr << "Warning: UDP Connection Closed" << std::endl;
-	else
-		std::cerr << "Error: UDPReceive Failed: " << std::endl;
-
+	else {
+		std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
+		std::cout << "Received UDP: " << recvBuff_ << std::endl;
+	}
 
 #elif _WIN32
 
 	std::cout << "Listeng for udp data..." << std::endl;
-	int s = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &dest_, (int*)sizeof(dest_));
-	if (s > 0) {
-		std::cout << "Received: " << socket_ << "BYTES" << std::endl;
-		std::cout << "Received: " << recvBuff_ << std::endl;
-	}
-	else if (s == 0)
-		std::cerr << "Warning: UDP Connection Closed" << std::endl;
-	else
-		std::cerr << "Error: UDPReceive Failed: " << WSAGetLastError() << std::endl;
 
+	int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (SOCKADDR*)&senderAddr_, (int*)sizeof(senderAddr_));
+
+	if (result == SOCKET_ERROR)
+		std::cerr << "Error: UDP Recvfrom failed with error: " << WSAGetLastError() << std::endl;
+	else{
+		std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
+		std::cout << "Received UDP: " << recvBuff_ << std::endl;
+	}
 
 #endif // __APPLE__
 
@@ -144,7 +150,7 @@ void UDPNetwork::sendData(std::string message)
 
 #elif _WIN32
 
-	if (sendto(socket_, buffer, strlen(buffer), 0, (struct sockaddr *) &dest_, sizeof(dest_)) == SOCKET_ERROR) {
+	if (sendto(socket_, buffer, strlen(buffer), 0, (struct sockaddr *) &senderAddr_,sizeof(senderAddr_)) == SOCKET_ERROR) {
 		std::cerr << "Error: UDPSend Failed: " << WSAGetLastError() << std::endl;
 	}
 

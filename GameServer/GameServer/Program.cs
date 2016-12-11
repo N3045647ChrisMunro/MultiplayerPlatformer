@@ -9,8 +9,8 @@ namespace GameServer
         public static void Main (string[] args)
 		{
 
-            GameSever mainServer = new GameSever();
-            mainServer.StartServer(8080);
+            GameSever test = new GameSever();
+            test.StartServer(8080);
         }
 	}
 }

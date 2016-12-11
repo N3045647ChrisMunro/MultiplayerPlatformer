@@ -14,18 +14,17 @@ namespace GameServer
     {
 
         //Private Server/TCP variables
-        private Socket TCPlistener_;
-        private Socket UDPListener_;
-
+        private Socket listener_;
+        //private Socket udpListener_;
         //private TcpListener TCPlistener_;
         private static int serverPortNumber_;
         private Boolean isRunning_;
 
 
         private const int BUFFSIZE = 32;
-        private byte[] recvBuffer_ = new byte[BUFFSIZE];
+        //private byte[] recvBuffer_ = new byte[BUFFSIZE];
 
-        StateObject stateObject = new StateObject();
+        //StateObjects stateObject = new StateObjects();
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
         //Private UDP variables
@@ -43,20 +42,28 @@ namespace GameServer
                 //Create a TCPListener to Accept client connections
                 //TCPlistener_ = new TcpListener(IPAddress.Any, serverPortNumber_);
                 //TCPlistener_.Start();
+                //Console.WriteLine("Computer Name " + Dns.GetHostName());
+                //IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
+
                 IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
+
+                Console.WriteLine(ipHostInfo.AddressList[0]);
+
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 IPEndPoint localEndPoint = new IPEndPoint(ipAddress, serverPortNumber_);
 
-                TCPlistener_ = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                listener_ = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                TCPlistener_.Bind(localEndPoint);
-                
+                listener_.Bind(localEndPoint);
+
                 isRunning_ = true;
                 AcceptLoop();
             }
-            catch(SocketException se)
+            catch (SocketException se)
             {
                 Console.WriteLine(se.ErrorCode + ": " + se.Message);
+                Console.WriteLine("Source: " + se.Source);
+                Console.WriteLine("Message: " + se.Message);
                 //Environment.Exit(se.ErrorCode);
             }
 
@@ -65,7 +72,7 @@ namespace GameServer
         public void AcceptLoop()
         {
             //While the server is Active, Accept incoming Client Connections
-            while(isRunning_)
+            while (isRunning_)
             {
                 try
                 {
@@ -73,26 +80,20 @@ namespace GameServer
                     allDone.Reset();
 
                     Console.WriteLine("Listening For Connections");
-
-
-                    UdpClient udpClient = new UdpClient(8081);
-                    //ReceiveMessages();
-                    udpClient.BeginReceive(new AsyncCallback(RecvCallBack), udpClient);
-
                     //TcpClient newClient = TCPlistener_.AcceptTcpClient();
-                    TCPlistener_.Listen(100);
+                    listener_.Listen(100);
 
-                    TCPlistener_.BeginAccept(new AsyncCallback(AcceptCallBack), TCPlistener_);
+                    listener_.BeginAccept(new AsyncCallback(AcceptCallBack), listener_);
 
                     //Wait until a connection is made before continuing.
                     allDone.WaitOne();
-                    
+
                     //Once a client is found start a thread to handle the client
                     //Thread newThread = new Thread(new ParameterizedThreadStart(HandleClient));
                     //newThread.Start(newClient);
-                                   
+
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
@@ -100,6 +101,8 @@ namespace GameServer
             }
         }
 
+        //Accept a TCP socket
+        //Create a UDP client
         public static void AcceptCallBack(IAsyncResult ar)
         {
             //Signal the main thread to continue
@@ -110,41 +113,81 @@ namespace GameServer
             Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 
-            StateObject state = new StateObject();
+            StateObjects state = new StateObjects();
             state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
+            handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
 
-            //UdpClient udpClient = new UdpClient();
-            //UdpState udpState = new UdpState();
-            //udpClient.BeginReceive(new AsyncCallback(RecvCallBack), udpState);
+            /*
+			IPEndPoint localIPEndpoint = new IPEndPoint (IPAddress.Any, 8082);
+
+			//Create a udp socket for the new client
+			UdpClient udpCleint = new UdpClient(localIPEndpoint);
+			udpCleint.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+			UdpState udpStateObj = new UdpState ();
+			udpStateObj.socket = udpCleint;
+
+			udpCleint.Client.Bind (new IPEndPoint(IPAddress.Any, 8082));
+
+			//Begin UDP Receive
+			udpCleint.BeginReceive(new AsyncCallback(RecvCallBack), udpStateObj);
+			*/
+
+            Socket udpListener_;
+            udpListener_ = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            udpListener_.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8081);
+
+            udpListener_.Bind(endPoint);
+
+            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 8081);
+            EndPoint tempRemote = (EndPoint)sender;
+
+            UdpState udpStateObj = new UdpState();
+            udpStateObj.socket = udpListener_;
+            udpStateObj.endPoint = (IPEndPoint)endPoint;
+            udpStateObj.tempRemote = tempRemote;
+
+            udpListener_.BeginReceiveFrom(udpStateObj.buffer, 0, udpStateObj.buffer.Length, 0, ref tempRemote, new AsyncCallback(RecvCallBack), udpStateObj);
 
         }
 
+        //Read Data from a TCP socket
         public static void ReadCallBack(IAsyncResult ar)
         {
             String content = String.Empty;
 
             //Retrieve the state object and the handler socket
             //from the asynchronous state object
-            StateObject state = (StateObject)ar.AsyncState;
+            StateObjects state = (StateObjects)ar.AsyncState;
             Socket handler = state.workSocket;
 
-            int bytesRead = handler.EndReceive(ar);
+            SocketError errorCode;
+            int bytesRead = handler.EndReceive(ar, out errorCode);
 
-            if(bytesRead > 0){
-                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-                content = state.sb.ToString();
-                char[] delimitors = { ':' };
-                String[] parts = content.Split(delimitors);
+            if (bytesRead > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                Console.WriteLine("read {0} bytes from the socket. \nData : {1}", content.Length, content);
+                handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
+                if (sb.Length > 1)
+                {
+                    content = sb.ToString();
+                    char[] delimitors = { ':' };
+                    String[] parts = content.Split(delimitors);
 
-                Send(handler, content);
+                    Console.WriteLine("read {0} bytes from the socket. \nData : {1}", content.Length, content);
+                    Send(handler, "Hello Client");
+                }
+
             }
             else
             {
-                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
+                //handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
             }
+
         }
 
         public static void Send(Socket handler, String data)
@@ -166,10 +209,8 @@ namespace GameServer
                 int bytesSent = handler.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to client", bytesSent);
 
-                //handler.Shutdown(SocketShutdown.Both);
-                //handler.Close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
@@ -180,34 +221,34 @@ namespace GameServer
 
         public static void RecvCallBack(IAsyncResult ar)
         {
-            Console.WriteLine("HelloWorld");
-            UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).u;
-            IPEndPoint e = (IPEndPoint)((UdpState)(ar.AsyncState)).e;
+            UdpState s = (UdpState)ar.AsyncState;
 
-            Byte[] receiveBytes = u.EndReceive(ar, ref e);
-            string receiveString = Encoding.ASCII.GetString(receiveBytes);
+            int recvBytes = s.socket.EndReceive(ar);
 
-            Console.WriteLine("Recieved: {0}", receiveString);
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Encoding.ASCII.GetString(s.buffer, 0, recvBytes));
+            //s.buffer = recvBytes;
 
+            string receiveString = Encoding.ASCII.GetString(s.buffer);
+
+            Console.WriteLine("Recieved UDP: {0}", receiveString);
+
+            SendUDPMessage(s, "Hello UDP Client");
             // The message needs to be handled
             udpMessageReceived_ = true;
 
+            s.socket.BeginReceive(s.buffer, 0, s.buffer.Length, 0, new AsyncCallback(RecvCallBack), s);
         }
 
         public static void ReceiveMessages()
         {
             // Receive message and write to the console
-            IPEndPoint e = new IPEndPoint(IPAddress.Any, serverPortNumber_);
-            UdpClient u = new UdpClient(e);
-
             UdpState s = new UdpState();
-            s.e = e;
-            s.u = u;
 
             Console.WriteLine("Listening for udp Messages...");
-            u.BeginReceive(new AsyncCallback(RecvCallBack), s);
+            s.socket.BeginReceive(s.buffer, 0, s.buffer.Length, 0, new AsyncCallback(RecvCallBack), s.socket);
 
-            while(!udpMessageReceived_)
+            while (!udpMessageReceived_)
             {
                 Thread.Sleep(100);
             }
@@ -216,64 +257,36 @@ namespace GameServer
 
         public static void UDPSendCallBack(IAsyncResult ar)
         {
-            UdpClient u = (UdpClient)ar.AsyncState;
+            UdpState u = (UdpState)ar.AsyncState;
 
-            Console.WriteLine("Number of udp bytes sent: {0}", u.EndSend(ar));
+            //Console.WriteLine("Number of udp bytes sent: {0}", u.socket.EndSend(ar));
             udpMessageSent_ = true;
+
         }
 
-        public static void SendUDPMessage(string server, string message)
+        public static void SendUDPMessage(UdpState state, string message)
         {
-            UdpClient u = new UdpClient();
-
-            u.Connect(server, serverPortNumber_);
-
-            Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
-
-            // Send the message
-            u.BeginSend(sendBytes, sendBytes.Length, new AsyncCallback(SendCallBack), u);
-
-            while(!udpMessageSent_)
+            try
             {
-                Thread.Sleep(100);
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+
+                Console.WriteLine("Trying to send udp message");
+
+                // Send the message
+                state.socket.BeginSend(sendBytes, 0, sendBytes.Length, 0, new AsyncCallback(UDPSendCallBack), state);
+
+                while (!udpMessageSent_)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
             }
 
         }
 
-
-        //public void HandleClient(object obj)
-        //{
-        //    NetworkStream netStream = null;
-        //    try
-        //    {
-        //        // Retrieve the Client from the parameter passed to the thread
-        //        TcpClient client = (TcpClient)obj;
-
-        //        Console.WriteLine("Handling Client...");
-
-        //        netStream = client.GetStream();
-
-        //        // Receive until client closes connection, indicated by the 0 return value
-        //        int bytesRecvd = 0;
-        //        int totalBytesEchoed = 0;
-
-        //        while ((bytesRecvd = netStream.Read(recvBuffer_, 0, recvBuffer_.Length)) > 0)
-        //        {
-        //            netStream.Write(recvBuffer_, 0, bytesRecvd);
-        //            totalBytesEchoed += bytesRecvd;
-        //        }
-
-        //        Console.WriteLine("Echoed {0} BYTES", totalBytesEchoed);
-
-        //        netStream.Close();
-        //        client.Close();
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        Console.WriteLine(e.Message);
-        //        netStream.Close();
-        //    }
-        //}
-
     }
 }
+

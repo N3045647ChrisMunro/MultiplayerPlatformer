@@ -158,12 +158,12 @@ void TCPNetwork::sendData(std::string message)
 		WSACleanup();
 	}
 
-	//shut down the connection so no more data can be sent
-
 	if (sockfd_ == SOCKET_ERROR) {
 		std::cerr << "Error: Shutdown failed with error: " << WSAGetLastError() << std::endl;
 		closesocket(ConnectSocket_);
 	}
+
+	std::cout << "Sent: " << buffer << std::endl;
 
 
 #endif //  __APPLE__ 
@@ -198,8 +198,8 @@ void TCPNetwork::receiveData()
 	sockfd_ = recv(ConnectSocket_, recvBuff_, sizeof(recvBuff_), 0);
 
 	if (sockfd_ > 0) {
-		std::cout << "Received: " << sockfd_ << "BYTES" << std::endl;
-		std::cout << "Received: " << recvBuff_ << std::endl;
+		std::cout << "Received TCP: " << sockfd_ << "BYTES" << std::endl;
+		std::cout << "Received TCP: " << recvBuff_ << std::endl;
 	}
 	else if (sockfd_ == 0)
 		std::cout << "Warning: Connection Closed" << std::endl;

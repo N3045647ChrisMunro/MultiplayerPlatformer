@@ -50,10 +50,9 @@ bool GameState::createWorld()
 		tcpNetwork_->connectToServer();
 		tcpNetwork_->sendData("Hello");
 
-		//udpNetwork_.setIP_address(std::string("192.168.56.1"));
+		//udpNetwork_.setIP_address("192.168.170.1");
 		udpNetwork_.setPortNumber(8081);
 		udpNetwork_.createSocket();
-		udpNetwork_.sendData("Hello UDP");
 
 		return true;
 	}
@@ -70,7 +69,7 @@ void GameState::updateWorld()
 
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	//TODO: Remove this 
 	Platform groundPlatform;
@@ -112,7 +111,11 @@ void GameState::updateWorld()
 			if (event.type == sf::Event::Closed)
 			{
 				window_->close();
-			}				
+			}		
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
+			{
+				udpNetwork_.sendData("Hello ");
+			}
 		}
 	
 		shape.setPosition(Box2.getBody()->GetPosition().x * PPM, Box2.getBody()->GetPosition().y * PPM);
@@ -133,7 +136,7 @@ void GameState::updateWorld()
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
-	//udp_recvThread.join();
+	udp_recvThread.join();
 }
 
 //Clean and "free up" Memory

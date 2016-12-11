@@ -6,8 +6,7 @@
 //  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
-#ifndef UDPNetwork_hpp
-#define UDPNetwork_hpp
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -61,14 +60,11 @@ private:
 
 #elif _WIN32
 
-	struct sockaddr_in local_, dest_;
-
-	SOCKET socket_ = INVALID_SOCKET;
+	struct sockaddr_in recvAddr_, senderAddr_;
+	SOCKET socket_;
 
 #endif // __APPLE__
 
 };
 
-
-#endif /* UDPNetwork_hpp */
 
