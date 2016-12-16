@@ -39,9 +39,10 @@ public:
 
 private:
 
-	enum GameEntities { player, bullet, platform, enemy};
 	void recvTCPMessage();
 	void recvUDPMessage();
+
+	void startClient();
 
 private:
 

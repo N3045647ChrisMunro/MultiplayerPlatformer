@@ -31,6 +31,9 @@ GameState::~GameState()
 bool GameState::createWorld()
 {
 	try {
+
+		startClient();
+
 		//Create game Window
 		window_ = new sf::RenderWindow(sf::VideoMode(1280, 720), "SFML Test");
 
@@ -48,7 +51,7 @@ bool GameState::createWorld()
 		tcpNetwork_->createSocket();
 
 		tcpNetwork_->connectToServer();
-		tcpNetwork_->sendData("Hello");
+		//tcpNetwork_->sendData("reg:Lee:1111");
 
 		//udpNetwork_.setIP_address("192.168.170.1");
 		udpNetwork_.setPortNumber(8081);
@@ -69,7 +72,7 @@ void GameState::updateWorld()
 
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	//TODO: Remove this 
 	Platform groundPlatform;
@@ -136,7 +139,7 @@ void GameState::updateWorld()
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
-	udp_recvThread.join();
+	//udp_recvThread.join();
 }
 
 //Clean and "free up" Memory
@@ -179,5 +182,31 @@ void GameState::recvUDPMessage()
 	{
 		udpNetwork_.receiveData();
 	}
+}
+
+void GameState::startClient()
+{
+	std::cout << "Hello, and Welcome To Chris Munro's super awesomely incredible unrivalled Multiplayer Platform Shoter" << std::endl;
+	std::cout << "1: Register" << std::endl;
+	std::cout << "2: Login" << std::endl;
+	std::cout << ">>: ";
+
+	char input;
+	std::cin >> input;
+
+	std::cout << "" << std::endl;
+
+	switch (input) {
+		case '1':
+			std::cout << "reg" << std::endl;
+		break;
+		case '2':
+			std::cout << "login" << std::endl;
+		break;
+		default:
+			std::cout << "Sorry, I dont understand that" << std::endl;
+		break;
+	}
+	
 }
 

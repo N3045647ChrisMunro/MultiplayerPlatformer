@@ -8,6 +8,8 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 
+using System.Data.SQLite;
+
 namespace GameServer
 {
     class GameSever
@@ -31,13 +33,15 @@ namespace GameServer
         private static bool udpMessageReceived_ = false;
         private static bool udpMessageSent_ = false;
 
+        //Database
+        private static SQLiteConnection dbConnection;
+
         public void StartServer(int portNumber)
         {
             try
             {
                 Console.WriteLine("Server Started");
                 serverPortNumber_ = portNumber;
-
 
                 //Create a TCPListener to Accept client connections
                 //TCPlistener_ = new TcpListener(IPAddress.Any, serverPortNumber_);
@@ -56,6 +60,44 @@ namespace GameServer
 
                 listener_.Bind(localEndPoint);
 
+                //Create the Client Database
+
+                //SQLiteConnection.CreateFile("ClientDatabase.sqlite");
+
+                //Open the database file
+                dbConnection = new SQLiteConnection("Data Source=ClientDatabase.sqlite; Version=3;");
+                dbConnection.Open();
+
+                //Check to see if a 'clients' table already exists, if one doesn't create one
+                SQLiteCommand cmd = dbConnection.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = dbConnection;
+                cmd.CommandText = "SELECT * FROM sqlite_master WHERE type = 'table' AND name = @name";
+                cmd.Parameters.AddWithValue("@name", "clients");
+                //If the reader actually reads data that means the table already exists.
+                using (SQLiteDataReader sqlReader = cmd.ExecuteReader())
+                {
+                    if (sqlReader.Read())
+                    {
+                        //Do nothing ,, table exists
+                        Console.WriteLine("Table Exists");
+                    }
+                    else
+                    {
+                        //Table does not exist
+                        //Create a clients table which will hold usernames and passwords...
+                        //TODO look into password secruity. 
+                        string sql = "create table clients (username varchar(20), password varchar(20))";
+
+                        SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                //Close the connection after excuting the command
+                dbConnection.Close();
+
+                //Start the accept loop to handle new connected clients
                 isRunning_ = true;
                 AcceptLoop();
             }
@@ -179,7 +221,58 @@ namespace GameServer
                     String[] parts = content.Split(delimitors);
 
                     Console.WriteLine("read {0} bytes from the socket. \nData : {1}", content.Length, content);
-                    Send(handler, "Hello Client");
+
+                    //if the recieved string starts with reg: a new client is requesting to be registered onto the server
+                    //so the server will then add the new client to a sqlite database storing username/id, password, and socket information
+                    //Handle client registration..
+                    if (parts[0] == "reg")
+                    {
+                        //Open the database to add content
+                        dbConnection.Open();
+
+                        int exists = 0;
+
+                        //First a query needs to be made to the database to see if the username is avaible
+                        string query = "SELECT COUNT(*) FROM clients WHERE username = @userName";
+                        using (SQLiteCommand cmd = new SQLiteCommand(query, dbConnection))
+                        {
+                            cmd.Parameters.AddWithValue("@userName", parts[1]);
+                            exists = Convert.ToInt32(cmd.ExecuteScalar());
+                        }
+                        if (exists > 0)
+                        {
+                            //Cannot reg client with this user name
+                            Send(handler, "Sorry! Username " + parts[1] + " already exists. :(");
+                        }
+                        else
+                        {
+                            //Username isn't taken, register the client
+                            Client newClient = new Client();
+
+                            newClient.username = parts[1];
+
+                            string sql = "INSERT INTO clients (username, password) VALUES (@username, @password)";
+                            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+                            command.Parameters.AddWithValue("@username", newClient.username);
+                            command.Parameters.AddWithValue("@password", parts[2]);
+
+                            command.ExecuteNonQuery();
+
+                            Send(handler, "Welcome " + parts[1] + " to the best multiplayer platformer game server EVER!");
+                        }
+
+                        string sql1 = "select * from clients";
+                        SQLiteCommand command1 = new SQLiteCommand(sql1, dbConnection);
+
+                        SQLiteDataReader reader = command1.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            Console.WriteLine("Username: " + reader["username"] + " Password: " + reader["password"]);
+                        }
+
+                        //Close the database
+                        dbConnection.Close();
+                    }
                 }
 
             }

@@ -20,7 +20,7 @@
 int main()
 {
 	GameState *gameState = new GameState();
-	
+
 	if (gameState->createWorld())
 	{
 		gameState->updateWorld();
