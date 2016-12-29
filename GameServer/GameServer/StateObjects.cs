@@ -27,8 +27,7 @@ namespace GameServer
 	class UdpState
 	{
 		public IPEndPoint endPoint;
-		public EndPoint tempRemote;
-		public Socket socket;
+		public UdpClient socket;
 
 		public const int BufferSize = 1024;
 

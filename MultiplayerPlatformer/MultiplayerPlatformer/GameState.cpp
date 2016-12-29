@@ -51,9 +51,9 @@ bool GameState::createWorld()
 		tcpNetwork_->createSocket();
 
 		tcpNetwork_->connectToServer();
-		//tcpNetwork_->sendData("reg:Lee:1111");
+		tcpNetwork_->sendData("reg:" + username_ + ":1111");
 
-		//udpNetwork_.setIP_address("192.168.170.1");
+		udpNetwork_.setIP_address("192.168.170.1");
 		udpNetwork_.setPortNumber(8081);
 		udpNetwork_.createSocket();
 
@@ -72,7 +72,7 @@ void GameState::updateWorld()
 
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	//TODO: Remove this 
 	Platform groundPlatform;
@@ -117,7 +117,7 @@ void GameState::updateWorld()
 			}		
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
 			{
-				udpNetwork_.sendData("Hello ");
+				udpNetwork_.sendData("Hello from udp client: " + username_);
 			}
 		}
 	
@@ -139,7 +139,7 @@ void GameState::updateWorld()
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
-	//udp_recvThread.join();
+	udp_recvThread.join();
 }
 
 //Clean and "free up" Memory
@@ -195,10 +195,19 @@ void GameState::startClient()
 	std::cin >> input;
 
 	std::cout << "" << std::endl;
+	std::string name;
 
 	switch (input) {
 		case '1':
 			std::cout << "reg" << std::endl;
+
+			std::cout << "Username: ";
+			std::cin >> name;
+
+			username_ = name;
+
+			std::cout << std::endl;
+
 		break;
 		case '2':
 			std::cout << "login" << std::endl;
@@ -207,6 +216,5 @@ void GameState::startClient()
 			std::cout << "Sorry, I dont understand that" << std::endl;
 		break;
 	}
-	
 }
 

@@ -1,14 +1,15 @@
-﻿<Properties StartupItem="GameServer/GameServer.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GameServer/GameSever.cs">
+﻿<Properties StartupConfiguration="{7C0A69EE-4827-4EF7-B3CD-263206B701E5}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="GameServer/StateObjects.cs">
     <Files>
       <File FileName="GameServer/Program.cs" Line="1" Column="1" />
-      <File FileName="GameServer/GameSever.cs" Line="147" Column="33" />
+      <File FileName="GameServer/GameSever.cs" Line="12" Column="29" />
       <File FileName="GameServer/StateObjects.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.GameServer PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>

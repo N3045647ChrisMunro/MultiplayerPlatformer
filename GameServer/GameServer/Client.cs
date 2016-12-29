@@ -8,9 +8,6 @@ namespace GameServer
 {
     class Client
     {
-
         public string username { get; set; }
-
-
     }
 }

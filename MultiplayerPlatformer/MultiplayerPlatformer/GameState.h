@@ -54,6 +54,8 @@ private:
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
 
+	std::string username_; 
+
 	//Game Physics Variables
 	b2World *world_{ nullptr };
 	b2Vec2 gravity_{ 0.f, 10.f };

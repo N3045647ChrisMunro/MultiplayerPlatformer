@@ -72,26 +72,24 @@ void UDPNetwork::createSocket()
 
 	//Setup address structure
 	recvAddr_.sin_family = AF_INET;
-	recvAddr_.sin_port = htons(port_);
-	recvAddr_.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	recvAddr_.sin_port = htons(0);
+	recvAddr_.sin_addr.S_un.S_addr = inet_addr(ip_.c_str());
 
 	//Create a SOCKET for connecting to server
 	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	const bool trueValue = true;
-	socket_ = setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char *)&trueValue, sizeof(bool));
 
 	if (socket_ == INVALID_SOCKET) {
 		std::cerr << "Error: Invalid Socket: " << WSAGetLastError() << std::endl;
 		WSACleanup();
 	}
 
-	//int result = bind(socket_, (SOCKADDR *)&recvAddr_, sizeof(recvAddr_));
+	int result = bind(socket_, (SOCKADDR *)&recvAddr_, sizeof(recvAddr_));
 
 	//std::cout << "UDP RESULT: " << result << std::endl;
 
-	//if (result != 0) {
-	//	std::cerr << "Error: UDP Socket Bind Failed with Error: " << WSAGetLastError() << std::endl;
-	//}
+	if (result == SOCKET_ERROR) {
+		std::cerr << "Error: UDP Socket Bind Failed with Error: " << WSAGetLastError() << std::endl;
+	}
 
 #endif //  __APPLE__
 }
@@ -117,7 +115,10 @@ void UDPNetwork::receiveData()
 
 	std::cout << "Listeng for udp data..." << std::endl;
 
-	int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (SOCKADDR*)&senderAddr_, (int*)sizeof(senderAddr_));
+	sockaddr_in *from;
+
+	//int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (sockaddr *)&from, (int*)sizeof(from));
+	int result = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
 
 	if (result == SOCKET_ERROR)
 		std::cerr << "Error: UDP Recvfrom failed with error: " << WSAGetLastError() << std::endl;
@@ -150,7 +151,12 @@ void UDPNetwork::sendData(std::string message)
 
 #elif _WIN32
 
-	if (sendto(socket_, buffer, strlen(buffer), 0, (struct sockaddr *) &senderAddr_,sizeof(senderAddr_)) == SOCKET_ERROR) {
+	sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_addr.S_un.S_addr = inet_addr(ip_.c_str());
+	addr.sin_port = htons(port_);
+
+	if (sendto(socket_, buffer, strlen(buffer), 0, (struct sockaddr *) &addr, sizeof(addr)) == SOCKET_ERROR) {
 		std::cerr << "Error: UDPSend Failed: " << WSAGetLastError() << std::endl;
 	}
 
