@@ -1,7 +1,5 @@
-﻿  GameState.cpp
-  Generating Code...
-  Compiling...
-  main.cpp
-  Generating Code...
+﻿  TCPNetwork.cpp
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\tcpnetwork.cpp(187): warning C4244: 'initializing': conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\tcpnetwork.cpp(261): warning C4715: 'TCPNetwork::receiveData': not all control paths return a value
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.exe
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.pdb (Partial PDB)

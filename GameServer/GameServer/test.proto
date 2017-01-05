@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package test;
+
+message Reg{
+
+	string username = 1;
+	string password = 2;
+
+}

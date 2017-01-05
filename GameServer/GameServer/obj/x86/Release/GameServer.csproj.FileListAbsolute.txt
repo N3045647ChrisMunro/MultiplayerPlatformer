@@ -1,0 +1,9 @@
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\GameServer.exe
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\GameServer.pdb
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\System.Data.SQLite.dll
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\System.Data.SQLite.xml
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Release\GameServer.exe
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Release\GameServer.pdb
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\obj\x86\Release\GameServer.csprojResolveAssemblyReference.cache
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\Google.Protobuf.dll
+D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\GameServer\GameServer\bin\Release\Google.Protobuf.xml

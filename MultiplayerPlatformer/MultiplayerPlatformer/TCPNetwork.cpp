@@ -7,11 +7,11 @@
 //
 
 #include "TCPNetwork.hpp"
+#include <fstream>
 #include <string>
 
 TCPNetwork::TCPNetwork()
 {
-    memset(recvBuff_, '0', sizeof(recvBuff_));
 
 #ifdef __APPLE__
 
@@ -136,7 +136,7 @@ void TCPNetwork::connectToServer()
 #endif //  __APPLE__    
 }
 
-void TCPNetwork::sendData(std::string message)
+void TCPNetwork::sendData(std::string message, const unsigned int messageSize)
 {
 #ifdef  __APPLE__
     ssize_t n = send(sockfd_, message.c_str(), sizeof(message.c_str()), 0);
@@ -145,12 +145,12 @@ void TCPNetwork::sendData(std::string message)
         std::cerr << "Error: Failed to Send" << std::endl;
 
 #elif _WIN32
+	//const int size = strlen(message.c_str());
+	//char buffer[messageSize];
+	//memset(buffer, 0, size);
+	//memcpy(buffer, message.c_str(), message.length());
 
-	char buffer[1024];
-	memset(buffer, 0, 1024);
-	memcpy(buffer, message.c_str(), message.length());
-
-	sockfd_ = send(ConnectSocket_, buffer, (int)strlen(buffer), 0);
+	sockfd_ = send(ConnectSocket_, message.data(), strlen(message.c_str()), 0);
 
 	if (sockfd_ == SOCKET_ERROR) {
 		std::cerr << "Error: Send Failed With Error: " << WSAGetLastError() << std::endl;
@@ -163,9 +163,58 @@ void TCPNetwork::sendData(std::string message)
 		closesocket(ConnectSocket_);
 	}
 
-	std::cout << "Sent: " << buffer << std::endl;
+	//std::cout << "Sent: " << buffer << std::endl;
 
 
+#endif //  __APPLE__ 
+}
+
+void TCPNetwork::sendFile(std::string filename)
+{
+#ifdef  __APPLE__
+	ssize_t n = send(sockfd_, message.c_str(), sizeof(message.c_str()), 0);
+
+	if (n < 0)
+		std::cerr << "Error: Failed to Send" << std::endl;
+
+#elif _WIN32
+
+	//Get the file size
+	std::fstream fileToSend(filename, std::ios::in | std::ios::binary);
+	if (!fileToSend)
+		std::cerr << "Error: TCP Failed to open file: " << filename << std::endl;
+	fileToSend.seekg(0, std::ios::end);
+	unsigned int fileSize = fileToSend.tellg();
+	fileToSend.close();
+
+	//Get the File
+	char *buffer = new char[fileSize];
+	//memset(buffer, 0, sizeof(buffer));
+	fileToSend.open(filename, std::ios::binary);
+	fileToSend.seekg(0, std::ios::beg);
+	fileToSend.read(buffer, fileSize);
+	fileToSend.close();
+
+	//Send file in Chunks
+	const int FILE_CHUNK_SIZE = 2000;
+	unsigned int bytesSent = 0;
+	int bytesToSend = 0;
+
+	while (bytesSent < fileSize) {
+	
+		if (fileSize - bytesSent >= FILE_CHUNK_SIZE)
+			bytesToSend = FILE_CHUNK_SIZE;
+		else
+			bytesToSend = fileSize - bytesSent;
+
+		send(ConnectSocket_, buffer + bytesSent, bytesToSend, 0);
+		bytesSent += bytesToSend;
+
+	}
+	
+	std::cout << "Sent File: " << buffer << std::endl;
+	
+	delete[] buffer;
 #endif //  __APPLE__ 
 }
 
@@ -179,7 +228,7 @@ void TCPNetwork::setPortNumber(std::string port)
 	port_ = port;
 }
 
-void TCPNetwork::receiveData()
+std::string TCPNetwork::receiveData()
 {
 
 #ifdef  __APPLE__
@@ -199,7 +248,9 @@ void TCPNetwork::receiveData()
 
 	if (sockfd_ > 0) {
 		std::cout << "Received TCP: " << sockfd_ << "BYTES" << std::endl;
-		std::cout << "Received TCP: " << recvBuff_ << std::endl;
+		std::cout << "Received TCP: " << std::string(recvBuff_) << std::endl;
+		
+		return std::string(recvBuff_);
 	}
 	else if (sockfd_ == 0)
 		std::cout << "Warning: Connection Closed" << std::endl;

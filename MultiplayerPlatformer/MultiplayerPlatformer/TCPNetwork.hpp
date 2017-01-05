@@ -25,7 +25,7 @@
 #endif
 
 #include <iostream>
-
+#include "Messager.h"
 
 class TCPNetwork{
 
@@ -36,8 +36,9 @@ public:
     
     void createSocket();
     void connectToServer();
-    void receiveData();
-    void sendData(std::string message);
+    std::string receiveData();
+    void sendData(std::string message, const unsigned int messageSize);
+	void sendFile(std::string filename);
     
 	void setIP_address(std::string ip);
 	void setPortNumber(std::string port);

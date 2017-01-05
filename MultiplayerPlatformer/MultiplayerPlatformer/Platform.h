@@ -14,6 +14,8 @@ public:
 
 	void createSmall(b2World *world, const b2Vec2 &position);
 
+	void createGroundPlane(b2World *world, const b2Vec2 &position, const float &width, const float &height);
+
 	const Box& getCollisionBox() const { return platformCollisonBox_; }
 	void setPosition(const sf::Vector2f pos);
 	sf::Vector2f getPosition() const { return position_; }

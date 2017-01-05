@@ -15,10 +15,12 @@
 #include <vector>
 #include "TCPNetwork.hpp"
 #include "Box.h"
+#include "test.pb.h"
 
 //Include Network classes
 #include "TCPNetwork.hpp"
 #include "UDPNetwork.h"
+#include "Messager.h"
 
 
 //Forward Declaration of Game Classes
@@ -43,10 +45,12 @@ private:
 	void recvUDPMessage();
 
 	void startClient();
+	void setupPlatforms();
 
 private:
 
 	//Game World Variables
+	std::vector<sf::VideoMode> windowDimensions_;
 	sf::RenderWindow* window_{ nullptr };
 	sf::Clock clock_;
 	
@@ -54,7 +58,8 @@ private:
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
 
-	std::string username_; 
+	std::string username_;
+	std::string password_;
 
 	//Game Physics Variables
 	b2World *world_{ nullptr };
@@ -64,9 +69,9 @@ private:
 	const int groundHeight_{ 700 };
 	const float gravitySpeed_{ 0.3f };
 
-
 	//Gameplay Variables
 	Player *player_{ nullptr };
+	sf::RectangleShape groundSF_;
 
 };
 
