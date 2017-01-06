@@ -131,24 +131,24 @@
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="GameDataTCP.pb.cc" />
+    <ClCompile Include="GameDataUDP.pb.cc" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TCPNetwork.cpp" />
-    <ClCompile Include="test.pb.cc" />
     <ClCompile Include="UDPNetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="GameDataTCP.pb.h" />
+    <ClInclude Include="GameDataUDP.pb.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Messager.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TCPNetwork.hpp" />
-    <ClInclude Include="test.pb.h" />
     <ClInclude Include="UDPNetwork.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

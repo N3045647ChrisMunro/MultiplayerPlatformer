@@ -13,6 +13,7 @@
 
 //Protobuf
 #include "GameDataTCP.pb.h"
+#include "GameDataUDP.pb.h"
 
 //Include Game Classes
 #include "Player.h"
@@ -68,11 +69,15 @@ bool GameState::createWorld()
 void GameState::updateWorld()
 {
 	// Create and start the receive thread
-	//std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
+	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+
+	sf::Vector2f tempPos = player_->getPosition();
 
 	while (window_->isOpen())
 	{
+		window_->clear(sf::Color(55, 236, 252));
+		
 		sf::Time deltaTime = clock_.restart();
 
 		world_->Step(deltaTime.asSeconds(), 8, 3);
@@ -90,10 +95,15 @@ void GameState::updateWorld()
 			}
 		}
 
+		if (player_->getPosition() != tempPos) {
+			updatePosMessage();
+
+			tempPos = player_->getPosition();
+		}
+
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
 
-		window_->clear(sf::Color(55, 236, 252));
 
 		for (auto p : platforms_) {
 			window_->draw(*p);
@@ -104,8 +114,8 @@ void GameState::updateWorld()
 	}
 
 	//When the game window closes, join the threads back to the "main" thread
-	//tcp_recvThread.join();
-	//udp_recvThread.join();
+	tcp_recvThread.join();
+	udp_recvThread.join();
 }
 
 //Clean and "free up" Memory
@@ -173,9 +183,7 @@ void GameState::startClient()
 	std::cout << std::endl;
 
 	std::string buff_string;
-	std::string messageString;
 	std::string recvString;
-	int size;
 
 	switch (input) {
 		case '1':
@@ -198,7 +206,6 @@ void GameState::startClient()
 			dataMsg->set_allocated_register_(regData);
 
 			buff_string = dataMsg->SerializeAsString();
-			size = buff_string.size();
 
 			std::cout << buff_string << std::endl;
 			
@@ -251,5 +258,20 @@ void GameState::setupPlatforms()
 	platforms_.push_back(platform1);
 	platforms_.push_back(platform);
 	platforms_.push_back(groundPlatform);
+}
+
+void GameState::updatePosMessage()
+{
+	GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
+	GameDataUDP::PositionUpdate* posData = new GameDataUDP::PositionUpdate();
+
+	posData->set_xpos(player_->getPosition().x);
+	posData->set_ypos(player_->getPosition().y);
+	dataMsg->set_allocated_positionupdate(posData);
+
+	std::string stringBuff = dataMsg->SerializeAsString();
+
+	udpNetwork_.sendData(stringBuff);
+
 }
 

@@ -15,7 +15,6 @@
 #include <vector>
 #include "TCPNetwork.hpp"
 #include "Box.h"
-#include "test.pb.h"
 
 //Include Network classes
 #include "TCPNetwork.hpp"
@@ -46,6 +45,8 @@ private:
 
 	void startClient();
 	void setupPlatforms();
+
+	void updatePosMessage();
 
 private:
 

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Data.SQLite;
+using System.Collections;
 using Google.Protobuf;
 
 namespace GameServer
@@ -28,6 +29,11 @@ namespace GameServer
         //Private UDP variables
         private static bool udpMessageReceived_ = false;
         private static bool udpMessageSent_ = false;
+
+        private static IPEndPoint broadcastEP = new IPEndPoint(IPAddress.Any, 0);
+
+        //Queues
+        private static Queue UDPmessageQueue_ = new Queue();
 
         //Database
         private static SQLiteConnection dbConnection;
@@ -144,10 +150,8 @@ namespace GameServer
             state.workSocket = handler;
             handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
 
-
-            IPEndPoint localIPEndpoint = new IPEndPoint(IPAddress.Any, 8081);
-
             //Create a udp socket for the new client
+            IPEndPoint localIPEndpoint = new IPEndPoint(IPAddress.Any, 8081);
             UdpClient udpClient = new UdpClient();
             udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
@@ -155,6 +159,9 @@ namespace GameServer
 
             UdpState udpStateObj = new UdpState();
             udpStateObj.socket = udpClient;
+
+            //Broadcast
+
 
             //Begin UDP Receive
             udpClient.BeginReceive(new AsyncCallback(RecvCallBack), udpStateObj);
@@ -288,18 +295,30 @@ namespace GameServer
         {
             UdpState s = (UdpState)ar.AsyncState;
 
-            Byte[] recvBytes = s.socket.EndReceive(ar, ref s.endPoint);
+            byte[] recvBytes = s.socket.EndReceive(ar, ref s.endPoint);
             s.buffer = recvBytes;
+            
+            UDPmessageQueue_.Enqueue(recvBytes);
 
-            string receiveString = Encoding.ASCII.GetString(s.buffer);
+            Console.WriteLine("Udp message Queue: {0}", UDPmessageQueue_.Count);
 
-            Console.WriteLine("Recieved UDP: {0}", receiveString);
+            //Using Protobuf, deserialize the recieved bytes/string so we can now use the protobuf generated functions
+            //to access the data (protoData.Register.Username)
+            GameDataUDP.DataMessage protoData = new GameDataUDP.DataMessage();
+            protoData = GameDataUDP.DataMessage.Parser.ParseFrom((byte[])UDPmessageQueue_.Dequeue());
 
-            SendUDPMessage(s, "Hello UDP Client", s.socket);
+            if (protoData.PositionUpdate != null)
+            {
+                float a = protoData.PositionUpdate.XPos;
+                Console.WriteLine("Recieved UDP: {0}", protoData.PositionUpdate.ToString());
+            }
+
+            SendUDPMessage("Pos broad cast", s.socket, s.endPoint);
             // The message needs to be handled
             udpMessageReceived_ = true;
 
             s.socket.BeginReceive(new AsyncCallback(RecvCallBack), s);
+
         }
 
         public static void ReceiveMessages()
@@ -315,6 +334,8 @@ namespace GameServer
                 Thread.Sleep(100);
             }
 
+
+
         }
 
         public static void UDPSendCallBack(IAsyncResult ar)
@@ -326,14 +347,14 @@ namespace GameServer
 
         }
 
-        public static void SendUDPMessage(UdpState state, string message, UdpClient client)
+        public static void SendUDPMessage(string message, UdpClient client, IPEndPoint endPoint)
         {
             try
             {
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
 
                 // Send the message
-                client.BeginSend(sendBytes, sendBytes.Length, state.endPoint, new AsyncCallback(UDPSendCallBack), client);
+                client.BeginSend(sendBytes, sendBytes.Length, endPoint, new AsyncCallback(UDPSendCallBack), client);
 
                 while (!udpMessageSent_)
                 {

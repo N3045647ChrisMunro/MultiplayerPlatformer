@@ -156,7 +156,9 @@ void UDPNetwork::sendData(std::string message)
 	addr.sin_addr.S_un.S_addr = inet_addr(ip_.c_str());
 	addr.sin_port = htons(port_);
 
-	if (sendto(socket_, buffer, strlen(buffer), 0, (struct sockaddr *) &addr, sizeof(addr)) == SOCKET_ERROR) {
+	auto a = message.size();
+
+	if (sendto(socket_, message.data(), message.size(), 0, (struct sockaddr *) &addr, sizeof(addr)) == SOCKET_ERROR) {
 		std::cerr << "Error: UDPSend Failed: " << WSAGetLastError() << std::endl;
 	}
 

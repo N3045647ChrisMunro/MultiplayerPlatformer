@@ -45,10 +45,10 @@
     <ClCompile Include="UDPNetwork.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
-    <ClCompile Include="test.pb.cc">
+    <ClCompile Include="GameDataTCP.pb.cc">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
-    <ClCompile Include="GameDataTCP.pb.cc">
+    <ClCompile Include="GameDataUDP.pb.cc">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,10 +77,10 @@
     <ClInclude Include="Messager.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
-    <ClInclude Include="test.pb.h">
+    <ClInclude Include="GameDataTCP.pb.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
-    <ClInclude Include="GameDataTCP.pb.h">
+    <ClInclude Include="GameDataUDP.pb.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,6 @@ namespace GameServer
 	{
         public static void Main (string[] args)
 		{
-
             GameSever test = new GameSever();
             test.StartServer(8080);
         }

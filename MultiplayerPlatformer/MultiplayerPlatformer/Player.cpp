@@ -35,7 +35,7 @@ void Player::createSprite(b2World *world)
 	pSprite_.setOrigin(frameWidth_ / 2, frameHeight_ / 2);
 	pSprite_.setTexture(pTexture_);
 
-	playerPos_ = sf::Vector2f(700, 0);
+	playerPos_ = sf::Vector2f(700, 400);
 
 	pSprite_.setPosition(playerPos_.x, playerPos_.y);
 

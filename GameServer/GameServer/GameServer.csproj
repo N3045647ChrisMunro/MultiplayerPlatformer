@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="GameDataTCP.cs" />
+    <Compile Include="GameDataUDP.cs" />
     <Compile Include="GameSever.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
