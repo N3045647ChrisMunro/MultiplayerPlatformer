@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package GameData;
+
+message Register{
+
+	string username = 1;
+	string password = 2;
+}
+
+message Login{
+
+	string username = 1;
+	string password = 2;
+}
+
+message DataMessage{
+	
+	Register register = 1;
+	Login login = 2;
+	
+	float xPos = 3;
+	float yPos = 4;
+
+}

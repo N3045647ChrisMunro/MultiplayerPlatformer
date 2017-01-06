@@ -136,7 +136,7 @@ void TCPNetwork::connectToServer()
 #endif //  __APPLE__    
 }
 
-void TCPNetwork::sendData(std::string message, const unsigned int messageSize)
+void TCPNetwork::sendData(std::string message)
 {
 #ifdef  __APPLE__
     ssize_t n = send(sockfd_, message.c_str(), sizeof(message.c_str()), 0);
@@ -145,11 +145,6 @@ void TCPNetwork::sendData(std::string message, const unsigned int messageSize)
         std::cerr << "Error: Failed to Send" << std::endl;
 
 #elif _WIN32
-	//const int size = strlen(message.c_str());
-	//char buffer[messageSize];
-	//memset(buffer, 0, size);
-	//memcpy(buffer, message.c_str(), message.length());
-
 	sockfd_ = send(ConnectSocket_, message.data(), strlen(message.c_str()), 0);
 
 	if (sockfd_ == SOCKET_ERROR) {
@@ -157,15 +152,6 @@ void TCPNetwork::sendData(std::string message, const unsigned int messageSize)
 		closesocket(ConnectSocket_);
 		WSACleanup();
 	}
-
-	if (sockfd_ == SOCKET_ERROR) {
-		std::cerr << "Error: Shutdown failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(ConnectSocket_);
-	}
-
-	//std::cout << "Sent: " << buffer << std::endl;
-
-
 #endif //  __APPLE__ 
 }
 

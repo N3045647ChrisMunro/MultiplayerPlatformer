@@ -37,7 +37,7 @@ public:
     void createSocket();
     void connectToServer();
     std::string receiveData();
-    void sendData(std::string message, const unsigned int messageSize);
+    void sendData(std::string message);
 	void sendFile(std::string filename);
     
 	void setIP_address(std::string ip);

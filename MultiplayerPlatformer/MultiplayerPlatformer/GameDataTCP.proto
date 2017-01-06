@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package GameDataTCP;
+
+message Register{
+
+	string username = 1;
+	string password = 2;
+}
+
+message Login{
+
+	string username = 1;
+	string password = 2;
+}
+
+message ChatMessage{
+
+	string recipient = 1;
+	string chatMsg = 2;
+
+}
+
+message DataMessage{
+	
+	Register register = 1;
+	Login login = 2;
+	ChatMessage chatMessage = 3;
+
+}

@@ -11,6 +11,9 @@
 #include <thread>
 #include <fstream>
 
+//Protobuf
+#include "GameDataTCP.pb.h"
+
 //Include Game Classes
 #include "Player.h"
 #include "Bullet.h"
@@ -91,7 +94,6 @@ void GameState::updateWorld()
 		player_->update(event, deltaTime.asSeconds());
 
 		window_->clear(sf::Color(55, 236, 252));
-		window_->draw(groundSF_);
 
 		for (auto p : platforms_) {
 			window_->draw(*p);
@@ -157,19 +159,9 @@ void GameState::startClient()
 	tcpNetwork_->createSocket();
 	tcpNetwork_->connectToServer();
 
-	test::Reg reg;
+	GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
+	GameDataTCP::Register* regData = new GameDataTCP::Register();
 	std::string name, pass;
-
-	//Open the proto file
-	std::fstream fileInput("test.proto", std::ios::in | std::ios::binary);
-	if (!fileInput) {
-		std::cerr << "ERROR: Failed to load proto file" << std::endl;
-	}
-	else if (!reg.ParseFromIstream(&fileInput)) {
-		std::cerr << "ERROR: Failed to parse proto file" << std::endl;
-	}
-
-	std::fstream fileOutput("test1.proto", std::ios::out | std::ios::trunc | std::ios::binary);
 
 	std::cout << "Hello, and Welcome To Chris Munro's super awesomely incredible unrivalled Multiplayer Platform Shooter" << std::endl;
 	std::cout << "1: Register" << std::endl;
@@ -200,29 +192,27 @@ void GameState::startClient()
 			username_ = name;
 			password_ = pass;
 
-			reg.set_username(name);
-			reg.set_password(pass);
+			regData->set_username(name);
+			regData->set_password(pass);
 
-			messageString = "reg:" + name + ":" + pass;
+			dataMsg->set_allocated_register_(regData);
 
-			if (!reg.SerializeToOstream(&fileOutput)) {
-				std::cerr << "ERROR: Failed to write proto file" << std::endl;
-			}
-
-			fileOutput.close();
-
-			buff_string = reg.SerializeAsString();
+			buff_string = dataMsg->SerializeAsString();
 			size = buff_string.size();
 
 			std::cout << buff_string << std::endl;
+			
 			//Send a registration request to the server
-			//tcpNetwork_->sendFile("test1.proto");
-			tcpNetwork_->sendData(buff_string, size);
+			tcpNetwork_->sendData(buff_string);
 			recvString = tcpNetwork_->receiveData();
 
 			//Check to see wether the registration was successful
 			if (recvString == "reg:OK") {
-				std::cout << "APPPLLLEEEESSSS" << std::endl;
+				std::cout << "Registration Successful" << std::endl;
+			}
+			else {
+				std::cout << "Sorry That Username is Taken" << std::endl;
+				startClient();
 			}
 
 		break;
@@ -234,19 +224,10 @@ void GameState::startClient()
 		break;
 	}
 
-	//test::Reg reg1;
+	delete regData;
+	delete dataMsg;
 
-	//std::fstream newRead("test.proto", std::ios::in | std::ios::binary);
-	//if (!reg1.ParseFromIstream(&newRead)) {
-	//	std::cout << "1" << std::endl;
-	//}
-
-	//const test::Reg& reg2 = reg1;
-
-	//std::cout << "USERNAME IN PROTO FILE: " << reg2.username() << std::endl;
-	//std::cout << "PASSWORD IN PROTO FILE: " << reg2.password() << std::endl;
-
-
+	google::protobuf::ShutdownProtobufLibrary();
 }
 
 void GameState::setupPlatforms()
@@ -265,17 +246,7 @@ void GameState::setupPlatforms()
 
 	//Ground
 	Platform* groundPlatform = new Platform();
-	groundPlatform->createGroundPlane(world_, b2Vec2((window_->getSize().x / 2) / PPM, (window_->getSize().y - 34.f) / PPM), window_->getSize().x / PPM, 34.f / PPM);
-
-
-	groundSF_ = sf::RectangleShape(sf::Vector2f(1280.f, 25.f));
-	groundSF_.setOrigin(640.f, 12.5f);
-	groundSF_.setFillColor(sf::Color::Red);
-
-	Box groundBox;
-	groundBox.init(world_, { 640.f / PPM, 600.f / PPM }, { 1280.f / PPM, 25.f / PPM }, false);
-
-	groundSF_.setPosition(sf::Vector2f(groundBox.getBody()->GetPosition().x * PPM, groundBox.getBody()->GetPosition().y * PPM));
+	groundPlatform->createGroundPlane(world_, b2Vec2((window_->getSize().x / 2) / PPM, (window_->getSize().y - 14.f) / PPM), window_->getSize().x / PPM, 34.f / PPM);
 
 	platforms_.push_back(platform1);
 	platforms_.push_back(platform);

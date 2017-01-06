@@ -48,6 +48,9 @@
     <ClCompile Include="test.pb.cc">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="GameDataTCP.pb.cc">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files\Network</Filter>
     </ClInclude>
     <ClInclude Include="test.pb.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="GameDataTCP.pb.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
   </ItemGroup>

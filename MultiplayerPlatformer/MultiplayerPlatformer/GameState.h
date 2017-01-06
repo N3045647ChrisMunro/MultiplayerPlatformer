@@ -71,7 +71,6 @@ private:
 
 	//Gameplay Variables
 	Player *player_{ nullptr };
-	sf::RectangleShape groundSF_;
 
 };
 

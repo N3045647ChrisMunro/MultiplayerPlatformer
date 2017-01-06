@@ -173,21 +173,71 @@ namespace GameServer
             SocketError errorCode;
             int bytesRead = handler.EndReceive(ar, out errorCode);
 
-            byte[] newBuffer = new byte[bytesRead];
-
-            Array.Copy(state.buffer, 0, newBuffer, 0, bytesRead);
-
-            Test.Reg reg = new Test.Reg();
-            reg = Test.Reg.Parser.ParseFrom(newBuffer);
-
             if (bytesRead > 0)
             {
                 //Allow Receiving to Happen again
                 handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
 
-                Console.WriteLine("Proto Serialized String: Username: {0}, Password: {1}", reg.Username.ToString(), reg.Password.ToString());
+                //Copy the contents of the state.buffer to a newBuffer, so that the content of the new buffer
+                //is filled with actual data and not empty "0's" / no data
+                byte[] newBuffer = new byte[bytesRead];
+                Array.Copy(state.buffer, 0, newBuffer, 0, bytesRead);
 
+                //Using Protobuf, deserialize the recieved bytes/string so we can now use the protobuf generated functions
+                //to access the data (protoData.Register.Username)
+                GameDataTCP.DataMessage protoData = new GameDataTCP.DataMessage();
+                protoData = GameDataTCP.DataMessage.Parser.ParseFrom(newBuffer);
 
+                //Console.WriteLine("Proto Serialized String: Username: {0}, Password: {1}", testProto.Register.Username.ToString(), testProto.Register.Password.ToString());
+
+                if (protoData.Register != null)
+                {
+                    //Open the database to add content
+                    dbConnection.Open();
+
+                    int exists = 0;
+
+                    //First a query needs to be made to the database to see if the username is avaible
+                    string query = "SELECT COUNT(*) FROM clients WHERE username = @userName";
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, dbConnection))
+                    {
+                        cmd.Parameters.AddWithValue("@userName", protoData.Register.Username.ToString());
+                        exists = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                    if (exists > 0)
+                    {
+                        //Cannot reg client with this user name
+                        Send(handler, "Sorry! Username " + protoData.Register.Username.ToString() + " already exists. :(");
+                    }
+                    else
+                    {
+                        //Username isn't taken, register the client
+                        Client newClient = new Client();
+
+                        newClient.username = protoData.Register.Username.ToString();
+
+                        string sql = "INSERT INTO clients (username, password) VALUES (@username, @password)";
+                        SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+                        command.Parameters.AddWithValue("@username", newClient.username);
+                        command.Parameters.AddWithValue("@password", protoData.Register.Password.ToString());
+
+                        command.ExecuteNonQuery();
+
+                        Send(handler, "reg:OK");
+                    }
+
+                    string sql1 = "select * from clients";
+                    SQLiteCommand command1 = new SQLiteCommand(sql1, dbConnection);
+
+                    SQLiteDataReader reader = command1.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("DATABASE: Username: " + reader["username"] + " Password: " + reader["password"]);
+                    }
+
+                    //Close the database
+                    dbConnection.Close();
+                }
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
@@ -200,64 +250,8 @@ namespace GameServer
                     String[] parts = content.Split(delimitors);
 
                     Console.WriteLine("read {0} bytes from the socket. \nData : {1}", content.Length, content);
-
-                    //if the recieved string starts with reg: a new client is requesting to be registered onto the server
-                    //so the server will then add the new client to a sqlite database storing username/id, password, and socket information
-                    //Handle client registration..
-                    if (parts[0] == "reg")
-                    {
-                        //Open the database to add content
-                        dbConnection.Open();
-
-                        int exists = 0;
-
-                        //First a query needs to be made to the database to see if the username is avaible
-                        string query = "SELECT COUNT(*) FROM clients WHERE username = @userName";
-                        using (SQLiteCommand cmd = new SQLiteCommand(query, dbConnection))
-                        {
-                            cmd.Parameters.AddWithValue("@userName", parts[1]);
-                            exists = Convert.ToInt32(cmd.ExecuteScalar());
-                        }
-                        if (exists > 0)
-                        {
-                            //Cannot reg client with this user name
-                            Send(handler, "Sorry! Username " + parts[1] + " already exists. :(");
-                        }
-                        else
-                        {
-                            //Username isn't taken, register the client
-                            Client newClient = new Client();
-
-                            newClient.username = parts[1];
-
-                            string sql = "INSERT INTO clients (username, password) VALUES (@username, @password)";
-                            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-                            command.Parameters.AddWithValue("@username", newClient.username);
-                            command.Parameters.AddWithValue("@password", parts[2]);
-
-                            command.ExecuteNonQuery();
-
-                            Send(handler, "reg:OK");
-                        }
-
-                        string sql1 = "select * from clients";
-                        SQLiteCommand command1 = new SQLiteCommand(sql1, dbConnection);
-
-                        SQLiteDataReader reader = command1.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            Console.WriteLine("Username: " + reader["username"] + " Password: " + reader["password"]);
-                        }
-
-                        //Close the database
-                        dbConnection.Close();
-                    }
                 }
 
-            }
-            else
-            {
-                //handler.BeginReceive(state.buffer, 0, StateObjects.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
             }
         }
 
