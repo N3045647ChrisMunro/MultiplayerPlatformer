@@ -9,6 +9,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "UDPNetwork.h"
+#include "GameDataUDP.pb.h"
 #include <string>
 
 
@@ -72,8 +73,9 @@ void UDPNetwork::createSocket()
 
 	//Setup address structure
 	recvAddr_.sin_family = AF_INET;
-	recvAddr_.sin_port = htons(0);
-	recvAddr_.sin_addr.S_un.S_addr = inet_addr(ip_.c_str());
+	recvAddr_.sin_port = htons(8082);
+	//recvAddr_.sin_addr.S_un.S_addr = inet_addr(ip_.c_str());
+	recvAddr_.sin_addr.S_un.S_addr = INADDR_ANY;
 
 	//Create a SOCKET for connecting to server
 	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -82,6 +84,10 @@ void UDPNetwork::createSocket()
 		std::cerr << "Error: Invalid Socket: " << WSAGetLastError() << std::endl;
 		WSACleanup();
 	}
+	char broadcast = 'a';
+	char reuse = 'b';
+	setsockopt(socket_, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
+	setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
 	int result = bind(socket_, (SOCKADDR *)&recvAddr_, sizeof(recvAddr_));
 
@@ -94,7 +100,7 @@ void UDPNetwork::createSocket()
 #endif //  __APPLE__
 }
 
-void UDPNetwork::receiveData()
+GameDataUDP::DataMessage* UDPNetwork::receiveData()
 {
 #ifdef __APPLE__
 
@@ -112,20 +118,38 @@ void UDPNetwork::receiveData()
 	}
 
 #elif _WIN32
+	if (socket_ > 0) {
+		std::cout << "Listeng for udp data..." << std::endl;
 
-	std::cout << "Listeng for udp data..." << std::endl;
+		GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
 
-	sockaddr_in *from;
+		sockaddr_in *from;
+		int size = sizeof(recvAddr_);
+		int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (sockaddr *)&recvAddr_, &size);
 
-	//int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (sockaddr *)&from, (int*)sizeof(from));
-	int result = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
+		//int result = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
 
-	if (result == SOCKET_ERROR)
-		std::cerr << "Error: UDP Recvfrom failed with error: " << WSAGetLastError() << std::endl;
-	else{
-		std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
-		std::cout << "Received UDP: " << recvBuff_ << std::endl;
+		if (result > 0) {
+			char *newBuffer = new char[result];
+
+			memcpy(newBuffer, recvBuff_, result);
+
+			if (!dataMsg->ParseFromArray(newBuffer, result)) {
+				std::cout << "Error: Parse Failed" << std::endl;
+				return nullptr;
+			}
+		}
+
+		if (result == SOCKET_ERROR)
+			std::cerr << "Error: UDP Recvfrom failed with error: " << WSAGetLastError() << std::endl;
+		else {
+			//std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
+			//std::cout << "Received UDP: " << newBuffer << std::endl;
+			return dataMsg;
+		}
 	}
+	else
+		std::cerr << "Error: UDP Connection Lost" << std::endl;
 
 #endif // __APPLE__
 
@@ -174,4 +198,23 @@ void UDPNetwork::setIP_address(std::string ip)
 void UDPNetwork::setPortNumber(int port)
 {
 	port_ = port;
+}
+
+bool UDPNetwork::isConnected() const
+{
+#ifdef __APPLE__
+
+	if (sockfd_ > 0) {
+		return true;
+	}
+	return false;
+
+#elif _WIN32
+
+	if (socket_ > 0) {
+		return true;
+	}
+	return false;
+
+#endif
 }

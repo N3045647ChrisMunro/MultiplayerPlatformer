@@ -42,6 +42,8 @@ public:
     
 	void setIP_address(std::string ip);
 	void setPortNumber(std::string port);
+
+	bool isConnected() const;
     
 private:
     

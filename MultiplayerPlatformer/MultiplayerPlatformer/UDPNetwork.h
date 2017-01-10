@@ -30,6 +30,7 @@
 #endif
 
 #include <iostream>
+#include "GameDataUDP.pb.h"
 
 class UDPNetwork
 {
@@ -38,11 +39,13 @@ public:
 	~UDPNetwork();
 
 	void createSocket();
-	void receiveData();
+	GameDataUDP::DataMessage* receiveData();
 	void sendData(std::string message);
 
 	void setIP_address(std::string ip);
 	void setPortNumber(int port);
+
+	bool isConnected() const;
 
 private:
 

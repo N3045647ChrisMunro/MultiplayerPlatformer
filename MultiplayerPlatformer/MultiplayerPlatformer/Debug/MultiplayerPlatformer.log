@@ -1,4 +1,4 @@
-﻿  GameState.cpp
+﻿  UDPNetwork.cpp
 d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\stubs\logging.h(100): warning C4251: 'google::protobuf::internal::LogMessage::message_': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'google::protobuf::internal::LogMessage'
   c:\program files (x86)\microsoft visual studio 14.0\vc\include\xstring(2633): note: see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
 d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\arena.h(555): warning C4251: 'google::protobuf::Arena::lifecycle_id_generator_': class 'google::protobuf::internal::SequenceNumber' needs to have dll-interface to be used by clients of class 'google::protobuf::Arena'
@@ -31,5 +31,7 @@ d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\mult
               _Kty=int,
               _Ty=google::protobuf::internal::ExtensionSet::Extension
           ]
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\udpnetwork.cpp(126): warning C4101: 'from': unreferenced local variable
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\udpnetwork.cpp(156): warning C4715: 'UDPNetwork::receiveData': not all control paths return a value
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.exe
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.pdb (Partial PDB)

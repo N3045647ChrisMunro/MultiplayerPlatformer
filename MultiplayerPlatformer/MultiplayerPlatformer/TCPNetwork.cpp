@@ -214,6 +214,25 @@ void TCPNetwork::setPortNumber(std::string port)
 	port_ = port;
 }
 
+bool TCPNetwork::isConnected() const
+{
+#ifdef __APPLE__
+
+	if (sockfd_ > 0) {
+		return true;
+	}
+	return false;
+
+#elif _WIN32
+
+	if (ConnectSocket_ > 0) {
+		return true;
+	}
+	return false;
+
+#endif
+}
+
 std::string TCPNetwork::receiveData()
 {
 
@@ -230,19 +249,24 @@ std::string TCPNetwork::receiveData()
 
 #elif _WIN32 
 
-	sockfd_ = recv(ConnectSocket_, recvBuff_, sizeof(recvBuff_), 0);
+	if (ConnectSocket_ > 0) {
 
-	if (sockfd_ > 0) {
-		std::cout << "Received TCP: " << sockfd_ << "BYTES" << std::endl;
-		std::cout << "Received TCP: " << std::string(recvBuff_) << std::endl;
-		
-		return std::string(recvBuff_);
+		sockfd_ = recv(ConnectSocket_, recvBuff_, sizeof(recvBuff_), 0);
+
+		if (sockfd_ > 0) {
+			std::cout << "Received TCP: " << sockfd_ << "BYTES" << std::endl;
+			std::cout << "Received TCP: " << std::string(recvBuff_) << std::endl;
+
+			return std::string(recvBuff_);
+		}
+		else if (sockfd_ == 0)
+			std::cout << "Warning: Connection Closed" << std::endl;
+		else
+			std::cerr << "Error: Received failed with error: " << WSAGetLastError() << std::endl;
 	}
-	else if (sockfd_ == 0)
-		std::cout << "Warning: Connection Closed" << std::endl;
-	else
-		std::cerr << "Error: Received failed with error: " << WSAGetLastError() << std::endl;
-
+	else {
+		std::cerr << "Error: TCP Connection Lost " << std::endl;
+	}
 #endif //  __APPLE__ 
 }
 

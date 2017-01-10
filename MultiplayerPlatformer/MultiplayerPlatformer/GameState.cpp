@@ -21,6 +21,8 @@
 #include "Box.h"
 #include "Platform.h"
 
+#include "google/protobuf/compiler/parser.h"
+
 #define PPM 30.f //Pixels per meter
 
 GameState::GameState()
@@ -89,10 +91,6 @@ void GameState::updateWorld()
 			{
 				window_->close();
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
-			{
-				udpNetwork_.sendData("Hello from udp client: ");
-			}
 		}
 
 		if (player_->getPosition() != tempPos) {
@@ -104,11 +102,9 @@ void GameState::updateWorld()
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
 
-
 		for (auto p : platforms_) {
 			window_->draw(*p);
 		}
-		
 		window_->draw(*player_);
 		window_->display();
 	}
@@ -148,7 +144,10 @@ void GameState::recvTCPMessage()
 {
 	while (true)
 	{
-		tcpNetwork_->receiveData();
+		if (tcpNetwork_->isConnected())
+			tcpNetwork_->receiveData();
+		else
+			std::cerr << "Error: Connection Lost" << std::endl;
 	}
 }
 
@@ -156,7 +155,21 @@ void GameState::recvUDPMessage()
 {
 	while (true)
 	{
-		udpNetwork_.receiveData();
+		if (udpNetwork_.isConnected()) {
+			GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
+
+			dataMsg = udpNetwork_.receiveData();
+
+			if (dataMsg->has_positionupdate()) {
+				std::cout << dataMsg->positionupdate().xpos() << ", " << dataMsg->positionupdate().ypos() << std::endl;
+			}
+			else {
+				std::cout << "UDP Proto: pos update is null" << std::endl;
+			}
+		}
+		else
+			std::cerr << "Error: Connection Lost (UDP)" << std::endl;
+
 	}
 }
 
