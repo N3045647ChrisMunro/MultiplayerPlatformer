@@ -18,15 +18,16 @@ void Platform::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(pfSprite_, states);
 }
 
-void Platform::createSmall(b2World *world, const b2Vec2 &position)
+void Platform::createPlatform(b2World *world, const b2Vec2 &position, const float &width, const float &height)
 {
-	if (!texture_.loadFromFile("Resources/platformSmall.png")) {
-		std::cerr << "Error: Platform Small Texture Failed to Load" << std::endl;
+	if (!texture_.loadFromFile("Resources/platformMid.png")) {
+		std::cerr << "Error: Platform Texture Failed to Load" << std::endl;
 	}
-
+	texture_.setRepeated(true);
 	pfSprite_.setTexture(texture_);
-	dimensions_ = sf::Vector2f(texture_.getSize());
+	dimensions_ = sf::Vector2f(width * PPM, height * PPM);
 	pfSprite_.setOrigin(dimensions_.x / 2.f, dimensions_.y / 2.f);
+	pfSprite_.setTextureRect({ 0, 0, (int)dimensions_.x, (int)dimensions_.y });
 	
 	platformCollisonBox_.init(world, position, { dimensions_.x / PPM, dimensions_.y / PPM}, false);
 	

@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Data.SQLite;
 using System.Collections;
 using Google.Protobuf;
+using System.Collections.Generic;
 
 namespace GameServer
 {
@@ -37,6 +38,10 @@ namespace GameServer
 
         //Database
         private static SQLiteConnection dbConnection;
+
+        //Clients List/Array for registered clients
+        const int MAX_CLIENTS = 6;
+        private static List<Client> registeredClients = new List<Client>();
 
         public void StartServer(int portNumber)
         {
@@ -212,13 +217,14 @@ namespace GameServer
                     if (exists > 0)
                     {
                         //Cannot reg client with this user name
-                        Send(handler, "Sorry! Username " + protoData.Register.Username.ToString() + " already exists. :(");
+                        //Send(handler, "Sorry! Username " + protoData.Register.Username.ToString() + " already exists. :(");
                     }
                     else
                     {
                         //Username isn't taken, register the client
                         Client newClient = new Client();
 
+                        newClient.socket = handler;
                         newClient.username = protoData.Register.Username.ToString();
 
                         string sql = "INSERT INTO clients (username, password) VALUES (@username, @password)";
@@ -228,7 +234,37 @@ namespace GameServer
 
                         command.ExecuteNonQuery();
 
-                        Send(handler, "reg:OK");
+                        //Add Client to Clients Array
+                        registeredClients.Add(newClient);
+
+                        //Send reg Success
+                        GameDataTCP.NewPlayerReg newRegData = new GameDataTCP.NewPlayerReg();
+                        GameDataTCP.DataMessage DataMsg = new GameDataTCP.DataMessage();
+                        newRegData.Username = newClient.username;
+                        newRegData.Status = "Success";
+
+                       // DataMsg.NewPlayerReg.Add(newRegData);
+                        DataMsg.NewPlayerReg.Insert(0, newRegData);
+
+                        byte[] buffer = DataMsg.ToByteArray();
+                                           
+                        Send(handler, buffer);
+
+                        //Relay the new reg to all currently registered players
+                        for(var i = 0; i < registeredClients.Count; i++)
+                        {
+                            if(registeredClients[i].username == newClient.username)
+                            {
+                                //Do Nothing We Dont want to send a message to this Client
+                                //Or Send info of current Clients
+                            }
+                            else
+                            {
+                                //string msg = "NewReg:" + newClient.username;
+                                //Send(registeredClients[i].socket, msg);
+                            }
+                        }
+
                     }
 
                     string sql1 = "select * from clients";
@@ -260,12 +296,11 @@ namespace GameServer
             }
         }
 
-        public static void Send(Socket handler, String data)
+        public static void Send(Socket handler, byte[] data)
         {
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
-
+            
             //Begin sending data to the remote device
-            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallBack), handler);
+            handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallBack), handler);
         }
 
         public static void SendCallBack(IAsyncResult ar)

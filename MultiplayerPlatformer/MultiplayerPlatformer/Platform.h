@@ -12,7 +12,7 @@ public:
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-	void createSmall(b2World *world, const b2Vec2 &position);
+	void createPlatform(b2World *world, const b2Vec2 &position, const float &width, const float &height);
 
 	void createGroundPlane(b2World *world, const b2Vec2 &position, const float &width, const float &height);
 

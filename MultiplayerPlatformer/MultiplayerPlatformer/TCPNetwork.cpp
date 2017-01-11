@@ -233,7 +233,7 @@ bool TCPNetwork::isConnected() const
 #endif
 }
 
-std::string TCPNetwork::receiveData()
+GameDataTCP::DataMessage* TCPNetwork::receiveData()
 {
 
 #ifdef  __APPLE__
@@ -250,14 +250,23 @@ std::string TCPNetwork::receiveData()
 #elif _WIN32 
 
 	if (ConnectSocket_ > 0) {
+		GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
 
 		sockfd_ = recv(ConnectSocket_, recvBuff_, sizeof(recvBuff_), 0);
 
 		if (sockfd_ > 0) {
-			std::cout << "Received TCP: " << sockfd_ << "BYTES" << std::endl;
-			std::cout << "Received TCP: " << std::string(recvBuff_) << std::endl;
 
-			return std::string(recvBuff_);
+			char *newBuffer = new char[sockfd_];
+
+			memcpy(newBuffer, recvBuff_, sockfd_);
+
+			if (!dataMsg->ParseFromArray(newBuffer, sockfd_)) {
+				std::cerr << "Error: Parse Failed (TCP)" << std::endl;
+				return nullptr;
+			}
+
+			return dataMsg;
+
 		}
 		else if (sockfd_ == 0)
 			std::cout << "Warning: Connection Closed" << std::endl;

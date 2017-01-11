@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
+using System.Net.Sockets;
 
 namespace GameServer
 {
     class Client
     {
         public string username { get; set; }
+
+        public Socket socket { get; set; }
+
     }
 }

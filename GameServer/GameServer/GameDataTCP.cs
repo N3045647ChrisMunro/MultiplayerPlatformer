@@ -25,18 +25,21 @@ namespace GameDataTCP {
             "ChFHYW1lRGF0YVRDUC5wcm90bxILR2FtZURhdGFUQ1AiLgoIUmVnaXN0ZXIS",
             "EAoIdXNlcm5hbWUYASABKAkSEAoIcGFzc3dvcmQYAiABKAkiKwoFTG9naW4S",
             "EAoIdXNlcm5hbWUYASABKAkSEAoIcGFzc3dvcmQYAiABKAkiMQoLQ2hhdE1l",
-            "c3NhZ2USEQoJcmVjaXBpZW50GAEgASgJEg8KB2NoYXRNc2cYAiABKAkiiAEK",
-            "C0RhdGFNZXNzYWdlEicKCHJlZ2lzdGVyGAEgASgLMhUuR2FtZURhdGFUQ1Au",
-            "UmVnaXN0ZXISIQoFbG9naW4YAiABKAsyEi5HYW1lRGF0YVRDUC5Mb2dpbhIt",
-            "CgtjaGF0TWVzc2FnZRgDIAEoCzIYLkdhbWVEYXRhVENQLkNoYXRNZXNzYWdl",
-            "YgZwcm90bzM="));
+            "c3NhZ2USEQoJcmVjaXBpZW50GAEgASgJEg8KB2NoYXRNc2cYAiABKAkiMAoM",
+            "TmV3UGxheWVyUmVnEhAKCHVzZXJuYW1lGAEgASgJEg4KBnN0YXR1cxgCIAEo",
+            "CSK5AQoLRGF0YU1lc3NhZ2USJwoIcmVnaXN0ZXIYASABKAsyFS5HYW1lRGF0",
+            "YVRDUC5SZWdpc3RlchIhCgVsb2dpbhgCIAEoCzISLkdhbWVEYXRhVENQLkxv",
+            "Z2luEi0KC2NoYXRNZXNzYWdlGAMgASgLMhguR2FtZURhdGFUQ1AuQ2hhdE1l",
+            "c3NhZ2USLwoMbmV3UGxheWVyUmVnGAQgAygLMhkuR2FtZURhdGFUQ1AuTmV3",
+            "UGxheWVyUmVnYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.Register), global::GameDataTCP.Register.Parser, new[]{ "Username", "Password" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.Login), global::GameDataTCP.Login.Parser, new[]{ "Username", "Password" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.ChatMessage), global::GameDataTCP.ChatMessage.Parser, new[]{ "Recipient", "ChatMsg" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.DataMessage), global::GameDataTCP.DataMessage.Parser, new[]{ "Register", "Login", "ChatMessage" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.NewPlayerReg), global::GameDataTCP.NewPlayerReg.Parser, new[]{ "Username", "Status" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataTCP.DataMessage), global::GameDataTCP.DataMessage.Parser, new[]{ "Register", "Login", "ChatMessage", "NewPlayerReg" }, null, null, null)
           }));
     }
     #endregion
@@ -478,6 +481,151 @@ namespace GameDataTCP {
 
   }
 
+  public sealed partial class NewPlayerReg : pb::IMessage<NewPlayerReg> {
+    private static readonly pb::MessageParser<NewPlayerReg> _parser = new pb::MessageParser<NewPlayerReg>(() => new NewPlayerReg());
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<NewPlayerReg> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::GameDataTCP.GameDataTCPReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public NewPlayerReg() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public NewPlayerReg(NewPlayerReg other) : this() {
+      username_ = other.username_;
+      status_ = other.status_;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public NewPlayerReg Clone() {
+      return new NewPlayerReg(this);
+    }
+
+    /// <summary>Field number for the "username" field.</summary>
+    public const int UsernameFieldNumber = 1;
+    private string username_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Username {
+      get { return username_; }
+      set {
+        username_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "status" field.</summary>
+    public const int StatusFieldNumber = 2;
+    private string status_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Status {
+      get { return status_; }
+      set {
+        status_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as NewPlayerReg);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(NewPlayerReg other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Username != other.Username) return false;
+      if (Status != other.Status) return false;
+      return true;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Username.Length != 0) hash ^= Username.GetHashCode();
+      if (Status.Length != 0) hash ^= Status.GetHashCode();
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Username.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Username);
+      }
+      if (Status.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Status);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Username.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Username);
+      }
+      if (Status.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Status);
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(NewPlayerReg other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Username.Length != 0) {
+        Username = other.Username;
+      }
+      if (other.Status.Length != 0) {
+        Status = other.Status;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 10: {
+            Username = input.ReadString();
+            break;
+          }
+          case 18: {
+            Status = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class DataMessage : pb::IMessage<DataMessage> {
     private static readonly pb::MessageParser<DataMessage> _parser = new pb::MessageParser<DataMessage>(() => new DataMessage());
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -485,7 +633,7 @@ namespace GameDataTCP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::GameDataTCP.GameDataTCPReflection.Descriptor.MessageTypes[3]; }
+      get { return global::GameDataTCP.GameDataTCPReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -505,6 +653,7 @@ namespace GameDataTCP {
       Register = other.register_ != null ? other.Register.Clone() : null;
       Login = other.login_ != null ? other.Login.Clone() : null;
       ChatMessage = other.chatMessage_ != null ? other.ChatMessage.Clone() : null;
+      newPlayerReg_ = other.newPlayerReg_.Clone();
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -545,6 +694,16 @@ namespace GameDataTCP {
       }
     }
 
+    /// <summary>Field number for the "newPlayerReg" field.</summary>
+    public const int NewPlayerRegFieldNumber = 4;
+    private static readonly pb::FieldCodec<global::GameDataTCP.NewPlayerReg> _repeated_newPlayerReg_codec
+        = pb::FieldCodec.ForMessage(34, global::GameDataTCP.NewPlayerReg.Parser);
+    private readonly pbc::RepeatedField<global::GameDataTCP.NewPlayerReg> newPlayerReg_ = new pbc::RepeatedField<global::GameDataTCP.NewPlayerReg>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::GameDataTCP.NewPlayerReg> NewPlayerReg {
+      get { return newPlayerReg_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as DataMessage);
@@ -561,6 +720,7 @@ namespace GameDataTCP {
       if (!object.Equals(Register, other.Register)) return false;
       if (!object.Equals(Login, other.Login)) return false;
       if (!object.Equals(ChatMessage, other.ChatMessage)) return false;
+      if(!newPlayerReg_.Equals(other.newPlayerReg_)) return false;
       return true;
     }
 
@@ -570,6 +730,7 @@ namespace GameDataTCP {
       if (register_ != null) hash ^= Register.GetHashCode();
       if (login_ != null) hash ^= Login.GetHashCode();
       if (chatMessage_ != null) hash ^= ChatMessage.GetHashCode();
+      hash ^= newPlayerReg_.GetHashCode();
       return hash;
     }
 
@@ -592,6 +753,7 @@ namespace GameDataTCP {
         output.WriteRawTag(26);
         output.WriteMessage(ChatMessage);
       }
+      newPlayerReg_.WriteTo(output, _repeated_newPlayerReg_codec);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -606,6 +768,7 @@ namespace GameDataTCP {
       if (chatMessage_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ChatMessage);
       }
+      size += newPlayerReg_.CalculateSize(_repeated_newPlayerReg_codec);
       return size;
     }
 
@@ -632,6 +795,7 @@ namespace GameDataTCP {
         }
         ChatMessage.MergeFrom(other.ChatMessage);
       }
+      newPlayerReg_.Add(other.newPlayerReg_);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -661,6 +825,10 @@ namespace GameDataTCP {
               chatMessage_ = new global::GameDataTCP.ChatMessage();
             }
             input.ReadMessage(chatMessage_);
+            break;
+          }
+          case 34: {
+            newPlayerReg_.AddEntriesFrom(input, _repeated_newPlayerReg_codec);
             break;
           }
         }

@@ -72,7 +72,7 @@ void GameState::updateWorld()
 {
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	sf::Vector2f tempPos = player_->getPosition();
 
@@ -111,7 +111,7 @@ void GameState::updateWorld()
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
-	udp_recvThread.join();
+	//udp_recvThread.join();
 }
 
 //Clean and "free up" Memory
@@ -144,8 +144,14 @@ void GameState::recvTCPMessage()
 {
 	while (true)
 	{
-		if (tcpNetwork_->isConnected())
-			tcpNetwork_->receiveData();
+		if (tcpNetwork_->isConnected()) {
+			GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
+
+			GameDataTCP::NewPlayerReg* reg = new GameDataTCP::NewPlayerReg();
+
+			dataMsg = tcpNetwork_->receiveData();
+
+		}
 		else
 			std::cerr << "Error: Connection Lost" << std::endl;
 	}
@@ -185,6 +191,7 @@ void GameState::startClient()
 	GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
 	GameDataTCP::Register* regData = new GameDataTCP::Register();
 	std::string name, pass;
+	std::string status;
 
 	std::cout << "Hello, and Welcome To Chris Munro's super awesomely incredible unrivalled Multiplayer Platform Shooter" << std::endl;
 	std::cout << "1: Register" << std::endl;
@@ -224,16 +231,29 @@ void GameState::startClient()
 			
 			//Send a registration request to the server
 			tcpNetwork_->sendData(buff_string);
-			recvString = tcpNetwork_->receiveData();
+			dataMsg = tcpNetwork_->receiveData();
 
-			//Check to see wether the registration was successful
-			if (recvString == "reg:OK") {
-				std::cout << "Registration Successful" << std::endl;
+			//Handle the message
+			if (dataMsg->newplayerreg_size() == 1) {
+				status = dataMsg->newplayerreg().Get(0).status();
+
+				if (status == "Success") {
+					std::cout << "Registration Successful" << std::endl;
+				}
+				else if (status == "Fail") {
+					std::cout << "Sorry That Username is Taken" << std::endl;
+					startClient();
+				}
 			}
-			else {
-				std::cout << "Sorry That Username is Taken" << std::endl;
-				startClient();
-			}
+
+			////Check to see wether the registration was successful
+			//if (recvString == "reg:OK") {
+			//	std::cout << "Registration Successful" << std::endl;
+			//}
+			//else {
+			//	std::cout << "Sorry That Username is Taken" << std::endl;
+			//	startClient();
+			//}
 
 		break;
 		case '2':
@@ -254,23 +274,48 @@ void GameState::setupPlatforms()
 {
 	platforms_.clear();
 
-	Platform* platform1 = new Platform();
-	platform1->createSmall(world_, b2Vec2(700.f / PPM, 400.f / PPM));
-
-	Platform* platform = new Platform();
-	platform->createSmall(world_, b2Vec2(500.f / PPM, 400.f / PPM));
-
-	sf::RectangleShape shape(sf::Vector2f(25.f, 25.f));
-	shape.setOrigin(12.5f, 12.5f);
-	shape.setFillColor(sf::Color::Green);
-
 	//Ground
 	Platform* groundPlatform = new Platform();
 	groundPlatform->createGroundPlane(world_, b2Vec2((window_->getSize().x / 2) / PPM, (window_->getSize().y - 14.f) / PPM), window_->getSize().x / PPM, 34.f / PPM);
 
-	platforms_.push_back(platform1);
-	platforms_.push_back(platform);
 	platforms_.push_back(groundPlatform);
+
+	//Platforms at the bottom
+	const int numOfBotPlats = 3;
+	Platform* botPlatforms = new Platform[numOfBotPlats];
+
+	float botPlayWidth = 32 * 9;
+	int xPos = (window_->getSize().x / 3) - botPlayWidth;
+	for (unsigned int i = 0; i < numOfBotPlats; i++) {
+
+		botPlatforms[i].createPlatform(world_, b2Vec2(xPos / PPM, (groundPlatform->getPosition().y - 72.f) / PPM), botPlayWidth / PPM, 32.f / PPM);
+
+		platforms_.push_back(&botPlatforms[i]);
+		xPos += botPlayWidth * 2;
+	}
+
+	//Center platform
+	Platform* centerPlatform = new Platform();
+	const float centerX = window_->getSize().x / 2;
+	const float centerY = window_->getSize().y / 2;
+	const float centerWidth = 32 * 6; 
+	centerPlatform->createPlatform(world_, b2Vec2(centerX / PPM, centerY / PPM), centerWidth / PPM, 32.f / PPM);
+
+	platforms_.push_back(centerPlatform);
+
+	Platform* leftTop = new Platform();
+	const float leftTopWidth = 480.f;
+	leftTop->createPlatform(world_, b2Vec2((leftTopWidth - 32 * 3) / PPM, 224.f / PPM), leftTopWidth / PPM, 32.f / PPM);
+
+	platforms_.push_back(leftTop);
+
+	Platform* rightTop = new Platform();
+	const float rightTopWidth = 480.f;
+	const float rightTopPos = window_->getSize().x - (rightTopWidth / 2) - 32 * 3;
+	rightTop->createPlatform(world_, b2Vec2(rightTopPos / PPM, 224.f / PPM), rightTopWidth / PPM, 32.f / PPM);
+
+	platforms_.push_back(rightTop);
+
 }
 
 void GameState::updatePosMessage()

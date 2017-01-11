@@ -39,6 +39,7 @@ void protobuf_ShutdownFile_GameDataTCP_2eproto();
 class ChatMessage;
 class DataMessage;
 class Login;
+class NewPlayerReg;
 class Register;
 
 // ===================================================================
@@ -340,6 +341,105 @@ class ChatMessage : public ::google::protobuf::Message /* @@protoc_insertion_poi
 };
 // -------------------------------------------------------------------
 
+class NewPlayerReg : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:GameDataTCP.NewPlayerReg) */ {
+ public:
+  NewPlayerReg();
+  virtual ~NewPlayerReg();
+
+  NewPlayerReg(const NewPlayerReg& from);
+
+  inline NewPlayerReg& operator=(const NewPlayerReg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const NewPlayerReg& default_instance();
+
+  void Swap(NewPlayerReg* other);
+
+  // implements Message ----------------------------------------------
+
+  inline NewPlayerReg* New() const { return New(NULL); }
+
+  NewPlayerReg* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const NewPlayerReg& from);
+  void MergeFrom(const NewPlayerReg& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
+    return InternalSerializeWithCachedSizesToArray(false, output);
+  }
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(NewPlayerReg* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string username = 1;
+  void clear_username();
+  static const int kUsernameFieldNumber = 1;
+  const ::std::string& username() const;
+  void set_username(const ::std::string& value);
+  void set_username(const char* value);
+  void set_username(const char* value, size_t size);
+  ::std::string* mutable_username();
+  ::std::string* release_username();
+  void set_allocated_username(::std::string* username);
+
+  // optional string status = 2;
+  void clear_status();
+  static const int kStatusFieldNumber = 2;
+  const ::std::string& status() const;
+  void set_status(const ::std::string& value);
+  void set_status(const char* value);
+  void set_status(const char* value, size_t size);
+  ::std::string* mutable_status();
+  ::std::string* release_status();
+  void set_allocated_status(::std::string* status);
+
+  // @@protoc_insertion_point(class_scope:GameDataTCP.NewPlayerReg)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr username_;
+  ::google::protobuf::internal::ArenaStringPtr status_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_GameDataTCP_2eproto();
+  friend void protobuf_AssignDesc_GameDataTCP_2eproto();
+  friend void protobuf_ShutdownFile_GameDataTCP_2eproto();
+
+  void InitAsDefaultInstance();
+  static NewPlayerReg* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class DataMessage : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:GameDataTCP.DataMessage) */ {
  public:
   DataMessage();
@@ -427,6 +527,18 @@ class DataMessage : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::GameDataTCP::ChatMessage* release_chatmessage();
   void set_allocated_chatmessage(::GameDataTCP::ChatMessage* chatmessage);
 
+  // repeated .GameDataTCP.NewPlayerReg newPlayerReg = 4;
+  int newplayerreg_size() const;
+  void clear_newplayerreg();
+  static const int kNewPlayerRegFieldNumber = 4;
+  const ::GameDataTCP::NewPlayerReg& newplayerreg(int index) const;
+  ::GameDataTCP::NewPlayerReg* mutable_newplayerreg(int index);
+  ::GameDataTCP::NewPlayerReg* add_newplayerreg();
+  ::google::protobuf::RepeatedPtrField< ::GameDataTCP::NewPlayerReg >*
+      mutable_newplayerreg();
+  const ::google::protobuf::RepeatedPtrField< ::GameDataTCP::NewPlayerReg >&
+      newplayerreg() const;
+
   // @@protoc_insertion_point(class_scope:GameDataTCP.DataMessage)
  private:
 
@@ -435,6 +547,7 @@ class DataMessage : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::GameDataTCP::Register* register__;
   ::GameDataTCP::Login* login_;
   ::GameDataTCP::ChatMessage* chatmessage_;
+  ::google::protobuf::RepeatedPtrField< ::GameDataTCP::NewPlayerReg > newplayerreg_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_GameDataTCP_2eproto();
   friend void protobuf_AssignDesc_GameDataTCP_2eproto();
@@ -725,6 +838,98 @@ inline void ChatMessage::set_allocated_chatmsg(::std::string* chatmsg) {
 
 // -------------------------------------------------------------------
 
+// NewPlayerReg
+
+// optional string username = 1;
+inline void NewPlayerReg::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NewPlayerReg::username() const {
+  // @@protoc_insertion_point(field_get:GameDataTCP.NewPlayerReg.username)
+  return username_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NewPlayerReg::set_username(const ::std::string& value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:GameDataTCP.NewPlayerReg.username)
+}
+inline void NewPlayerReg::set_username(const char* value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:GameDataTCP.NewPlayerReg.username)
+}
+inline void NewPlayerReg::set_username(const char* value, size_t size) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:GameDataTCP.NewPlayerReg.username)
+}
+inline ::std::string* NewPlayerReg::mutable_username() {
+  
+  // @@protoc_insertion_point(field_mutable:GameDataTCP.NewPlayerReg.username)
+	return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NewPlayerReg::release_username() {
+  // @@protoc_insertion_point(field_release:GameDataTCP.NewPlayerReg.username)
+  
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NewPlayerReg::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
+    
+  } else {
+    
+  }
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:GameDataTCP.NewPlayerReg.username)
+}
+
+// optional string status = 2;
+inline void NewPlayerReg::clear_status() {
+  status_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NewPlayerReg::status() const {
+  // @@protoc_insertion_point(field_get:GameDataTCP.NewPlayerReg.status)
+  return status_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NewPlayerReg::set_status(const ::std::string& value) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:GameDataTCP.NewPlayerReg.status)
+}
+inline void NewPlayerReg::set_status(const char* value) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:GameDataTCP.NewPlayerReg.status)
+}
+inline void NewPlayerReg::set_status(const char* value, size_t size) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:GameDataTCP.NewPlayerReg.status)
+}
+inline ::std::string* NewPlayerReg::mutable_status() {
+  
+  // @@protoc_insertion_point(field_mutable:GameDataTCP.NewPlayerReg.status)
+  return status_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NewPlayerReg::release_status() {
+  // @@protoc_insertion_point(field_release:GameDataTCP.NewPlayerReg.status)
+  
+  return status_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NewPlayerReg::set_allocated_status(::std::string* status) {
+  if (status != NULL) {
+    
+  } else {
+    
+  }
+  status_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), status);
+  // @@protoc_insertion_point(field_set_allocated:GameDataTCP.NewPlayerReg.status)
+}
+
+// -------------------------------------------------------------------
+
 // DataMessage
 
 // optional .GameDataTCP.Register register = 1;
@@ -841,7 +1046,39 @@ inline void DataMessage::set_allocated_chatmessage(::GameDataTCP::ChatMessage* c
   // @@protoc_insertion_point(field_set_allocated:GameDataTCP.DataMessage.chatMessage)
 }
 
+// repeated .GameDataTCP.NewPlayerReg newPlayerReg = 4;
+inline int DataMessage::newplayerreg_size() const {
+  return newplayerreg_.size();
+}
+inline void DataMessage::clear_newplayerreg() {
+  newplayerreg_.Clear();
+}
+inline const ::GameDataTCP::NewPlayerReg& DataMessage::newplayerreg(int index) const {
+  // @@protoc_insertion_point(field_get:GameDataTCP.DataMessage.newPlayerReg)
+  return newplayerreg_.Get(index);
+}
+inline ::GameDataTCP::NewPlayerReg* DataMessage::mutable_newplayerreg(int index) {
+  // @@protoc_insertion_point(field_mutable:GameDataTCP.DataMessage.newPlayerReg)
+  return newplayerreg_.Mutable(index);
+}
+inline ::GameDataTCP::NewPlayerReg* DataMessage::add_newplayerreg() {
+  // @@protoc_insertion_point(field_add:GameDataTCP.DataMessage.newPlayerReg)
+  return newplayerreg_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::GameDataTCP::NewPlayerReg >*
+DataMessage::mutable_newplayerreg() {
+  // @@protoc_insertion_point(field_mutable_list:GameDataTCP.DataMessage.newPlayerReg)
+  return &newplayerreg_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::GameDataTCP::NewPlayerReg >&
+DataMessage::newplayerreg() const {
+  // @@protoc_insertion_point(field_list:GameDataTCP.DataMessage.newPlayerReg)
+  return newplayerreg_;
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

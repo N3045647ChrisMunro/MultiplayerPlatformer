@@ -25,7 +25,7 @@
 #endif
 
 #include <iostream>
-#include "Messager.h"
+#include "GameDataTCP.pb.h"
 
 class TCPNetwork{
 
@@ -36,7 +36,7 @@ public:
     
     void createSocket();
     void connectToServer();
-    std::string receiveData();
+	GameDataTCP::DataMessage* receiveData();
     void sendData(std::string message);
 	void sendFile(std::string filename);
     
