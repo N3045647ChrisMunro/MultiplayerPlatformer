@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <iostream>
+#include <sstream>
 #include <math.h>
 
 #define PPM 30.f
@@ -61,6 +62,7 @@ void Player::createSprite(b2World *world)
 
 	//Create Bullets
 	bullet_ = Bullet(world);
+	
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -74,14 +76,19 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	target.draw(colBox_, states);
 	target.draw(pSprite_, states);
 
-	if (blocking_)
-		target.draw(pShield_, states);
+	//if (usernameText_.getString()!= "")
+	//	target.draw(usernameText_, states);
 
+	if (blocking_) {
+		if (bullet_.isActive())
+			bullet_.draw(target, states);
+		target.draw(pShield_, states);
+	}
 }
 
 void Player::update(sf::Event event, float dt)
 {
-
+	usernameText_.setPosition(playerPos_.x, playerPos_.y + 25);
 	//Set Initial Velocity
 	velocity_ = playerCollisionBox_.getBody()->GetLinearVelocity();
 
@@ -255,6 +262,26 @@ void Player::jump(float deltaTime)
 void Player::setIsJumping(bool state)
 {
 	jumping_ = state;
+}
+
+void Player::setUsername(const std::string name)
+{
+	username_ = name;
+
+	//sf::Font font;
+	//if (!font.loadFromFile("Resources/sansation.ttf")) {
+	//	std::cerr << "Error: Failed to load font" << std::endl;
+	//}
+
+
+	//std::ostringstream ss;
+	//ss << username_; 
+	//usernameText_.setString(ss.str());
+	//usernameText_.setPosition(playerPos_.x, playerPos_.y + 25);
+	//usernameText_.setFont(font);
+	//usernameText_.setCharacterSize(20);
+	//usernameText_.setStyle(sf::Text::Bold);
+	//usernameText_.setFillColor(sf::Color::Blue);
 }
 
 void Player::moveRight(float deltaTime)

@@ -217,7 +217,16 @@ namespace GameServer
                     if (exists > 0)
                     {
                         //Cannot reg client with this user name
-                        //Send(handler, "Sorry! Username " + protoData.Register.Username.ToString() + " already exists. :(");
+                        //Send reg fail
+                        GameDataTCP.NewPlayerReg newRegData = new GameDataTCP.NewPlayerReg();
+                        GameDataTCP.DataMessage DataMsg = new GameDataTCP.DataMessage();
+                        newRegData.Status = "Failed";
+
+                        DataMsg.NewPlayerReg.Insert(0, newRegData);
+
+                        byte[] buffer = DataMsg.ToByteArray();
+
+                        Send(handler, buffer);
                     }
                     else
                     {
@@ -234,6 +243,8 @@ namespace GameServer
 
                         command.ExecuteNonQuery();
 
+                        dbConnection.Close();
+
                         //Add Client to Clients Array
                         registeredClients.Add(newClient);
 
@@ -243,62 +254,112 @@ namespace GameServer
                         newRegData.Username = newClient.username;
                         newRegData.Status = "Success";
 
-                       // DataMsg.NewPlayerReg.Add(newRegData);
                         DataMsg.NewPlayerReg.Insert(0, newRegData);
 
-                        byte[] buffer = DataMsg.ToByteArray();
-                                           
-                        Send(handler, buffer);
-
                         //Relay the new reg to all currently registered players
-                        for(var i = 0; i < registeredClients.Count; i++)
+                        //maybe send everything then check on client side if username is equal to player username
+                        //if yes dont add enemy, no add one
+                        GameDataTCP.NewPlayerReg[] oldClientData = new GameDataTCP.NewPlayerReg[registeredClients.Count];
+                        if (registeredClients.Count > 1)
                         {
-                            if(registeredClients[i].username == newClient.username)
+                            int idx = 1;
+                            for (int i = 0; i <= registeredClients.Count - 1; ++i)
                             {
-                                //Do Nothing We Dont want to send a message to this Client
-                                //Or Send info of current Clients
+                                oldClientData[i] = new GameDataTCP.NewPlayerReg();
+                                string tempUsername = registeredClients[i].username;
+                                if (registeredClients[i].username == newClient.username)
+                                {
+                                    //Send the information about already registered clients to the new client
+                                    foreach (var client in registeredClients)
+                                    {
+                                        //Make sure to not include the new client in the oldclient message
+                                        if(client.username != newClient.username)
+                                        {
+                                            oldClientData[idx - 1].Username = client.username;
+                                            oldClientData[idx - 1].Status = "oldClients";
+
+                                            DataMsg.NewPlayerReg.Insert(idx, oldClientData[idx - 1]);
+
+                                            idx++;
+                                        }
+                                   
+                                    }
+
+                                }
+                                else
+                                {
+                                    //Send New Reg to all current Clients
+                                    GameDataTCP.NewPlayerReg newClientData = new GameDataTCP.NewPlayerReg();
+                                    GameDataTCP.DataMessage clientMsg = new GameDataTCP.DataMessage();
+                                    newClientData.Username = newClient.username;
+                                    newClientData.Status = "NewReg";
+
+                                    clientMsg.NewPlayerReg.Insert(0, newClientData);
+
+                                    byte[] newClientRegBuffer = clientMsg.ToByteArray();
+
+                                    Send(registeredClients[i].socket, newClientRegBuffer);
+                                }
                             }
-                            else
-                            {
-                                //string msg = "NewReg:" + newClient.username;
-                                //Send(registeredClients[i].socket, msg);
-                            }
+
                         }
 
+                        //Send the Success reg message containing info and all previously registered clients
+                        byte[] buffer = DataMsg.ToByteArray();
+                        Send(handler, buffer);
+
                     }
 
-                    string sql1 = "select * from clients";
-                    SQLiteCommand command1 = new SQLiteCommand(sql1, dbConnection);
-
-                    SQLiteDataReader reader = command1.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Console.WriteLine("DATABASE: Username: " + reader["username"] + " Password: " + reader["password"]);
-                    }
-
-                    //Close the database
-                    dbConnection.Close();
                 }
-
-                StringBuilder sb = new StringBuilder();
-                sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                if (sb.Length > 1)
+                else if(protoData.NewPlayerReg.Count == 1)
                 {
-                    content = sb.ToString();
+                    string username = protoData.NewPlayerReg[0].Username;
+                    string status = protoData.NewPlayerReg[0].Status;
 
-                    char[] delimitors = { ':' };
-                    String[] parts = content.Split(delimitors);
+                    //Check to see if a client has requested to be removed from the database/server
+                    if(status == "UnReg")
+                    {
+                        dbConnection.Open();
 
-                    Console.WriteLine("read {0} bytes from the socket. \nData : {1}", content.Length, content);
+                        string removeString = "DELETE FROM clients WHERE username='" + username + "'";
+                        SQLiteCommand removeCMD = new SQLiteCommand(removeString, dbConnection);
+
+                        removeCMD.ExecuteNonQuery();
+
+                        dbConnection.Close();
+
+                        //Remove from Client List
+                        for(int i = 0; i < registeredClients.Count; i++)
+                        {
+                            if(registeredClients[i].username == username)
+                            {
+                                registeredClients.Remove(registeredClients[i]); 
+                            }
+                        }
+                    }
+
                 }
+
+                //Print the registed clients ... FOR DEBUGGING
+                dbConnection.Open();
+
+                string sql1 = "SELECT * FROM clients";
+                SQLiteCommand command1 = new SQLiteCommand(sql1, dbConnection);
+
+                SQLiteDataReader reader = command1.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine("DATABASE: Username: " + reader["username"] + " Password: " + reader["password"]);
+                }
+
+                //Close the database
+                dbConnection.Close();
 
             }
         }
 
         public static void Send(Socket handler, byte[] data)
         {
-            
             //Begin sending data to the remote device
             handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallBack), handler);
         }
@@ -312,7 +373,7 @@ namespace GameServer
 
                 //Complete sending the data to the remote device
                 int bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client", bytesSent);
+                Console.WriteLine("Sent {0} bytes to client {1}", bytesSent, handler.LocalEndPoint);
 
             }
             catch (Exception e)
@@ -333,8 +394,6 @@ namespace GameServer
 
             UDPmessageQueue_.Enqueue(recvBytes);
 
-            Console.WriteLine("Udp message Queue: {0}", UDPmessageQueue_.Count);
-
             if (UDPmessageQueue_.Count > 0)
             {
                 //Using Protobuf, deserialize the recieved bytes/string so we can now use the protobuf generated functions
@@ -345,14 +404,13 @@ namespace GameServer
                 if (protoData.PositionUpdate != null)
                 {
                     float a = protoData.PositionUpdate.XPos;
-                    Console.WriteLine("Recieved UDP: {0}", protoData.PositionUpdate.ToString());
+                    //Console.WriteLine("Recieved UDP: {0}", protoData.PositionUpdate.ToString());
 
                     //Broadcast the position Update to all players
                     byte[] messageBuffer = protoData.ToByteArray();
                     SendUDPMessage(messageBuffer, s.socket, broadcastEP);
                 }
-
-                
+  
             }
             // The message needs to be handled
             udpMessageReceived_ = true;
@@ -382,7 +440,7 @@ namespace GameServer
         {
             UdpClient u = (UdpClient)ar.AsyncState;
 
-            Console.WriteLine("Number of udp bytes sent: {0}", u.EndSend(ar));
+            //Console.WriteLine("Number of udp bytes sent: {0}", u.EndSend(ar));
             udpMessageSent_ = true;
 
         }

@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameDataTCP.pb.cc" />
     <ClCompile Include="GameDataUDP.pb.cc" />
     <ClCompile Include="GameState.cpp" />
@@ -142,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameDataTCP.pb.h" />
     <ClInclude Include="GameDataUDP.pb.h" />
     <ClInclude Include="GameState.h" />

@@ -24,6 +24,7 @@
 
 //Forward Declaration of Game Classes
 class Player;
+class Enemy;
 class Platform;
 
 class GameState
@@ -44,6 +45,7 @@ private:
 	void recvUDPMessage();
 
 	void startClient();
+	void unReg();
 	void setupPlatforms();
 
 	void updatePosMessage();
@@ -59,9 +61,6 @@ private:
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
 
-	std::string username_;
-	std::string password_;
-
 	//Game Physics Variables
 	b2World *world_{ nullptr };
 	b2Vec2 gravity_{ 0.f, 10.f };
@@ -71,7 +70,10 @@ private:
 	const float gravitySpeed_{ 0.3f };
 
 	//Gameplay Variables
+	std::string username_;
 	Player *player_{ nullptr };
+	std::vector<Enemy *> enemies_{ nullptr };
+	int enemiesIDXTracker_ = 0;
 
 };
 

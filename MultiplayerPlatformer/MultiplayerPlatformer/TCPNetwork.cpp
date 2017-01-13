@@ -250,8 +250,10 @@ GameDataTCP::DataMessage* TCPNetwork::receiveData()
 #elif _WIN32 
 
 	if (ConnectSocket_ > 0) {
-		GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
+		GameDataTCP::DataMessage *dataMsg = new GameDataTCP::DataMessage();
 
+		dataMsg->Clear();
+		memset(recvBuff_, 0, sizeof(recvBuff_));
 		sockfd_ = recv(ConnectSocket_, recvBuff_, sizeof(recvBuff_), 0);
 
 		if (sockfd_ > 0) {

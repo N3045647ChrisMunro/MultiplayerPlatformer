@@ -33,11 +33,17 @@ public:
 	void setIsJumping(bool state);
 	bool isOnPlatform() const { return onPlatform_; }
 
+	void setUsername(const std::string name);
+	std::string getUsername() const { return username_; }
+
 private:
 	
 	bool canJump_{ false };
 
 private:
+
+	std::string username_;
+	sf::Text usernameText_;
 
 	Box playerCollisionBox_;
 

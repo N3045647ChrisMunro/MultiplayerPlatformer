@@ -17,6 +17,7 @@
 
 //Include Game Classes
 #include "Player.h"
+#include "Enemy.h"
 #include "Bullet.h"
 #include "Box.h"
 #include "Platform.h"
@@ -38,26 +39,37 @@ bool GameState::createWorld()
 {
 	try {
 
+		//Creaate box2D physics world
+		world_ = new b2World(gravity_);
+		world_->SetAllowSleeping(true);
+
+		//Create / Initialize the Player
+		player_ = new Player();
+		player_->createSprite(world_);
+		player_->setUsername(username_);
+
+		const int MAX_ENEMIES = 10;
+		enemies_.clear();
+		enemies_.resize(MAX_ENEMIES);
+
+		for (unsigned int i = 0; i < enemies_.size(); i++) {
+			enemies_[i] = new Enemy();
+			enemies_[i]->createSprite(world_);
+		}
+
+		udpNetwork_.setIP_address("192.168.170.1");
+		udpNetwork_.setPortNumber(8081);
+		udpNetwork_.createSocket();
+
 		startClient();
 
 		//Create game Window
 		windowDimensions_ = sf::VideoMode::getFullscreenModes();
 		window_ = new sf::RenderWindow(windowDimensions_[0], "SFML Test");
 
-		//Creaate box2D physics world
-		world_ = new b2World(gravity_);
-		world_->SetAllowSleeping(true);
 
 		//Create all the platfroms for the game world
 		setupPlatforms();
-
-		//Create / Initialize the Player
-		player_ = new Player();
-		player_->createSprite(world_);
-
-		udpNetwork_.setIP_address("192.168.170.1");
-		udpNetwork_.setPortNumber(8081);
-		udpNetwork_.createSocket();
 
 		return true;
 	}
@@ -79,7 +91,7 @@ void GameState::updateWorld()
 	while (window_->isOpen())
 	{
 		window_->clear(sf::Color(55, 236, 252));
-		
+
 		sf::Time deltaTime = clock_.restart();
 
 		world_->Step(deltaTime.asSeconds(), 8, 3);
@@ -105,9 +117,22 @@ void GameState::updateWorld()
 		for (auto p : platforms_) {
 			window_->draw(*p);
 		}
+
+		if (enemies_.size() > 0) {
+			for (auto e : enemies_) {
+				if (e->isAlive()) {
+					window_->draw(*e);
+					e->update(deltaTime.asSeconds());
+				}
+			}
+		}
+
 		window_->draw(*player_);
+
 		window_->display();
 	}
+
+	unReg();
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
@@ -127,6 +152,10 @@ bool GameState::destroyWorld()
 		//Delete Gameplay Variabels
 		delete player_;
 
+		for (unsigned int i = 0; i < enemies_.size(); i++) {
+			delete enemies_[i];
+		}
+
 		delete tcpNetwork_;
 
 		return true;
@@ -145,11 +174,38 @@ void GameState::recvTCPMessage()
 	while (true)
 	{
 		if (tcpNetwork_->isConnected()) {
-			GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
 
+			GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
 			GameDataTCP::NewPlayerReg* reg = new GameDataTCP::NewPlayerReg();
+			dataMsg->Clear();
 
 			dataMsg = tcpNetwork_->receiveData();
+
+			//Handle the Message
+			try {
+				//Check to see if the message is aand update about newly registered players
+				if (dataMsg->newplayerreg_size() > 0) {
+
+					for (unsigned int i = 0; i < dataMsg->newplayerreg_size(); i++) {
+
+						std::string status = dataMsg->newplayerreg().Get(i).status();
+
+						if (status == "NewReg") {
+							std::cout << "New Player Registered" << std::endl;
+
+							enemies_[enemiesIDXTracker_]->setAliveStatus(true);
+							enemies_[enemiesIDXTracker_]->setUserName(dataMsg->newplayerreg().Get(0).username());
+							enemiesIDXTracker_++;
+
+							dataMsg->Clear();
+						}
+					}
+
+				}
+			}
+			catch (...) {
+				std::cerr << "Error: Exception in TCP Recv Thread" << std::endl;
+			}
 
 		}
 		else
@@ -206,68 +262,93 @@ void GameState::startClient()
 	std::string recvString;
 
 	switch (input) {
-		case '1':
-			std::cout << "reg" << std::endl;
+	case '1':
+		std::cout << "reg" << std::endl;
 
-			std::cout << "Username: ";
-			std::cin >> name;
+		std::cout << "Username: ";
+		std::cin >> name;
 
-			std::cout << "Password: ";
-			std::cin >> pass;
+		std::cout << "Password: ";
+		std::cin >> pass;
 
-			std::cout << std::endl;
+		std::cout << std::endl;
+		username_ = name;
 
-			username_ = name;
-			password_ = pass;
+		regData->set_username(name);
+		regData->set_password(pass);
 
-			regData->set_username(name);
-			regData->set_password(pass);
+		dataMsg->set_allocated_register_(regData);
 
-			dataMsg->set_allocated_register_(regData);
+		buff_string = dataMsg->SerializeAsString();
 
-			buff_string = dataMsg->SerializeAsString();
+		std::cout << buff_string << std::endl;
 
-			std::cout << buff_string << std::endl;
-			
-			//Send a registration request to the server
-			tcpNetwork_->sendData(buff_string);
-			dataMsg = tcpNetwork_->receiveData();
+		//Send a registration request to the server
+		tcpNetwork_->sendData(buff_string);
+		dataMsg = tcpNetwork_->receiveData();
 
-			//Handle the message
-			if (dataMsg->newplayerreg_size() == 1) {
-				status = dataMsg->newplayerreg().Get(0).status();
+		//Handle the message
+		if (dataMsg->newplayerreg_size() > 0) {
 
-				if (status == "Success") {
-					std::cout << "Registration Successful" << std::endl;
-				}
-				else if (status == "Fail") {
-					std::cout << "Sorry That Username is Taken" << std::endl;
-					startClient();
+			//Check to see wether the registration was successful
+			status = dataMsg->newplayerreg().Get(0).status();
+
+			if (status == "Success") {
+				std::cout << "Registration Successful" << std::endl;
+
+				if (dataMsg->newplayerreg_size() > 1) {
+					for (unsigned int i = 1; i < dataMsg->newplayerreg_size(); i++) {
+						status = dataMsg->newplayerreg().Get(i).status();
+						if (status == "oldClients") {
+							enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
+							enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
+
+							std::cout << enemies_[i - 1]->getUserName() << std::endl;
+						}
+
+					}
+
 				}
 			}
-
-			////Check to see wether the registration was successful
-			//if (recvString == "reg:OK") {
-			//	std::cout << "Registration Successful" << std::endl;
+			else if (status == "Failed") {
+				std::cout << "Sorry That Username is Taken" << std::endl;
+				startClient();
+			}
+			//else if (status == "oldClients")
+			//{
+			//	enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
+			//	enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
+			//	
+			//	dataMsg->Clear();
 			//}
-			//else {
-			//	std::cout << "Sorry That Username is Taken" << std::endl;
-			//	startClient();
-			//}
 
+		}
 		break;
-		case '2':
-			std::cout << "login" << std::endl;
+	case '2':
+		std::cout << "login" << std::endl;
 		break;
-		default:
-			std::cout << "Sorry, I dont understand that" << std::endl;
+	default:
+		std::cout << "Sorry, I dont understand that" << std::endl;
 		break;
 	}
 
-	delete regData;
-	delete dataMsg;
+	//delete regData;
+	//delete dataMsg;
+}
 
-	google::protobuf::ShutdownProtobufLibrary();
+void GameState::unReg()
+{
+	GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
+	GameDataTCP::NewPlayerReg* unRegMsg = new GameDataTCP::NewPlayerReg();
+
+	unRegMsg->set_username(player_->getUsername());
+	unRegMsg->set_status("UnReg");
+
+	dataMsg->mutable_newplayerreg()->AddAllocated(unRegMsg);
+
+	std::string buffer = dataMsg->SerializeAsString();
+
+	tcpNetwork_->sendData(buffer);
 }
 
 void GameState::setupPlatforms()
@@ -298,7 +379,7 @@ void GameState::setupPlatforms()
 	Platform* centerPlatform = new Platform();
 	const float centerX = window_->getSize().x / 2;
 	const float centerY = window_->getSize().y / 2;
-	const float centerWidth = 32 * 6; 
+	const float centerWidth = 32 * 6;
 	centerPlatform->createPlatform(world_, b2Vec2(centerX / PPM, centerY / PPM), centerWidth / PPM, 32.f / PPM);
 
 	platforms_.push_back(centerPlatform);
@@ -330,6 +411,8 @@ void GameState::updatePosMessage()
 	std::string stringBuff = dataMsg->SerializeAsString();
 
 	udpNetwork_.sendData(stringBuff);
+
+
 
 }
 
