@@ -119,8 +119,6 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 
 #elif _WIN32
 	if (socket_ > 0) {
-		std::cout << "Listeng for udp data..." << std::endl;
-
 		GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
 
 		sockaddr_in *from;

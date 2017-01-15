@@ -27,6 +27,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* PlayerPositionUpdate_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PlayerPositionUpdate_reflection_ = NULL;
+const ::google::protobuf::Descriptor* PlayerVelcityUpdate_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  PlayerVelcityUpdate_reflection_ = NULL;
 const ::google::protobuf::Descriptor* BulletPositionUpdate_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   BulletPositionUpdate_reflection_ = NULL;
@@ -65,7 +68,7 @@ void protobuf_AssignDesc_GameDataUDP_2eproto() {
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(KeyPress, _is_default_instance_));
   PlayerPositionUpdate_descriptor_ = file->message_type(1);
   static const int PlayerPositionUpdate_offsets_[3] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, sender_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, username_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, xpos_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, ypos_),
   };
@@ -80,7 +83,24 @@ void protobuf_AssignDesc_GameDataUDP_2eproto() {
       sizeof(PlayerPositionUpdate),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerPositionUpdate, _is_default_instance_));
-  BulletPositionUpdate_descriptor_ = file->message_type(2);
+  PlayerVelcityUpdate_descriptor_ = file->message_type(2);
+  static const int PlayerVelcityUpdate_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerVelcityUpdate, username_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerVelcityUpdate, xpos_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerVelcityUpdate, ypos_),
+  };
+  PlayerVelcityUpdate_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      PlayerVelcityUpdate_descriptor_,
+      PlayerVelcityUpdate::default_instance_,
+      PlayerVelcityUpdate_offsets_,
+      -1,
+      -1,
+      -1,
+      sizeof(PlayerVelcityUpdate),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerVelcityUpdate, _internal_metadata_),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PlayerVelcityUpdate, _is_default_instance_));
+  BulletPositionUpdate_descriptor_ = file->message_type(3);
   static const int BulletPositionUpdate_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BulletPositionUpdate, owner_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BulletPositionUpdate, xpos_),
@@ -97,7 +117,7 @@ void protobuf_AssignDesc_GameDataUDP_2eproto() {
       sizeof(BulletPositionUpdate),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BulletPositionUpdate, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BulletPositionUpdate, _is_default_instance_));
-  CollisionUpdate_descriptor_ = file->message_type(3);
+  CollisionUpdate_descriptor_ = file->message_type(4);
   static const int CollisionUpdate_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CollisionUpdate, playerhit_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CollisionUpdate, object_),
@@ -113,10 +133,11 @@ void protobuf_AssignDesc_GameDataUDP_2eproto() {
       sizeof(CollisionUpdate),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CollisionUpdate, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CollisionUpdate, _is_default_instance_));
-  DataMessage_descriptor_ = file->message_type(4);
-  static const int DataMessage_offsets_[4] = {
+  DataMessage_descriptor_ = file->message_type(5);
+  static const int DataMessage_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataMessage, keypress_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataMessage, playerposupdate_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataMessage, playervelocityupdate_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataMessage, bulletposupdate_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataMessage, collisionupdate_),
   };
@@ -149,6 +170,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       PlayerPositionUpdate_descriptor_, &PlayerPositionUpdate::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      PlayerVelcityUpdate_descriptor_, &PlayerVelcityUpdate::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       BulletPositionUpdate_descriptor_, &BulletPositionUpdate::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       CollisionUpdate_descriptor_, &CollisionUpdate::default_instance());
@@ -163,6 +186,8 @@ void protobuf_ShutdownFile_GameDataUDP_2eproto() {
   delete KeyPress_reflection_;
   delete PlayerPositionUpdate::default_instance_;
   delete PlayerPositionUpdate_reflection_;
+  delete PlayerVelcityUpdate::default_instance_;
+  delete PlayerVelcityUpdate_reflection_;
   delete BulletPositionUpdate::default_instance_;
   delete BulletPositionUpdate_reflection_;
   delete CollisionUpdate::default_instance_;
@@ -180,27 +205,32 @@ void protobuf_AddDesc_GameDataUDP_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\021GameDataUDP.proto\022\013GameDataUDP\")\n\010KeyP"
-    "ress\022\020\n\010username\030\001 \001(\t\022\013\n\003key\030\002 \001(\t\"B\n\024P"
-    "layerPositionUpdate\022\016\n\006sender\030\001 \001(\t\022\014\n\004x"
-    "Pos\030\002 \001(\002\022\014\n\004yPos\030\003 \001(\002\"A\n\024BulletPositio"
-    "nUpdate\022\r\n\005owner\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002\022\014\n\004"
-    "yPos\030\003 \001(\002\"4\n\017CollisionUpdate\022\021\n\tplayerH"
-    "it\030\001 \001(\t\022\016\n\006object\030\002 \001(\t\"\345\001\n\013DataMessage"
-    "\022\'\n\010keyPress\030\001 \001(\0132\025.GameDataUDP.KeyPres"
-    "s\022:\n\017playerPosUpdate\030\002 \001(\0132!.GameDataUDP"
-    ".PlayerPositionUpdate\022:\n\017bulletPosUpdate"
-    "\030\003 \001(\0132!.GameDataUDP.BulletPositionUpdat"
-    "e\0225\n\017collisionUpdate\030\004 \001(\0132\034.GameDataUDP"
-    ".CollisionUpdateb\006proto3", 504);
+    "ress\022\020\n\010username\030\001 \001(\t\022\013\n\003key\030\002 \001(\t\"D\n\024P"
+    "layerPositionUpdate\022\020\n\010username\030\001 \001(\t\022\014\n"
+    "\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001(\002\"C\n\023PlayerVelci"
+    "tyUpdate\022\020\n\010username\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002"
+    "\022\014\n\004yPos\030\003 \001(\002\"A\n\024BulletPositionUpdate\022\r"
+    "\n\005owner\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001("
+    "\002\"4\n\017CollisionUpdate\022\021\n\tplayerHit\030\001 \001(\t\022"
+    "\016\n\006object\030\002 \001(\t\"\245\002\n\013DataMessage\022\'\n\010keyPr"
+    "ess\030\001 \001(\0132\025.GameDataUDP.KeyPress\022:\n\017play"
+    "erPosUpdate\030\002 \001(\0132!.GameDataUDP.PlayerPo"
+    "sitionUpdate\022>\n\024playerVelocityUpdate\030\003 \001"
+    "(\0132 .GameDataUDP.PlayerVelcityUpdate\022:\n\017"
+    "bulletPosUpdate\030\004 \001(\0132!.GameDataUDP.Bull"
+    "etPositionUpdate\0225\n\017collisionUpdate\030\005 \001("
+    "\0132\034.GameDataUDP.CollisionUpdateb\006proto3", 639);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GameDataUDP.proto", &protobuf_RegisterTypes);
   KeyPress::default_instance_ = new KeyPress();
   PlayerPositionUpdate::default_instance_ = new PlayerPositionUpdate();
+  PlayerVelcityUpdate::default_instance_ = new PlayerVelcityUpdate();
   BulletPositionUpdate::default_instance_ = new BulletPositionUpdate();
   CollisionUpdate::default_instance_ = new CollisionUpdate();
   DataMessage::default_instance_ = new DataMessage();
   KeyPress::default_instance_->InitAsDefaultInstance();
   PlayerPositionUpdate::default_instance_->InitAsDefaultInstance();
+  PlayerVelcityUpdate::default_instance_->InitAsDefaultInstance();
   BulletPositionUpdate::default_instance_->InitAsDefaultInstance();
   CollisionUpdate::default_instance_->InitAsDefaultInstance();
   DataMessage::default_instance_->InitAsDefaultInstance();
@@ -599,7 +629,7 @@ void KeyPress::clear_key() {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int PlayerPositionUpdate::kSenderFieldNumber;
+const int PlayerPositionUpdate::kUsernameFieldNumber;
 const int PlayerPositionUpdate::kXPosFieldNumber;
 const int PlayerPositionUpdate::kYPosFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -626,7 +656,7 @@ void PlayerPositionUpdate::SharedCtor() {
     _is_default_instance_ = false;
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  sender_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   xpos_ = 0;
   ypos_ = 0;
 }
@@ -637,7 +667,7 @@ PlayerPositionUpdate::~PlayerPositionUpdate() {
 }
 
 void PlayerPositionUpdate::SharedDtor() {
-  sender_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
@@ -686,7 +716,7 @@ void PlayerPositionUpdate::Clear() {
 } while (0)
 
   ZR_(xpos_, ypos_);
-  sender_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 
 #undef ZR_HELPER_
 #undef ZR_
@@ -703,15 +733,15 @@ bool PlayerPositionUpdate::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string sender = 1;
+      // optional string username = 1;
       case 1: {
         if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_sender()));
+                input, this->mutable_username()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->sender().data(), this->sender().length(),
+            this->username().data(), this->username().length(),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "GameDataUDP.PlayerPositionUpdate.sender"));
+            "GameDataUDP.PlayerPositionUpdate.username"));
         } else {
           goto handle_unusual;
         }
@@ -773,14 +803,14 @@ failure:
 void PlayerPositionUpdate::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:GameDataUDP.PlayerPositionUpdate)
-  // optional string sender = 1;
-  if (this->sender().size() > 0) {
+  // optional string username = 1;
+  if (this->username().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->sender().data(), this->sender().length(),
+      this->username().data(), this->username().length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "GameDataUDP.PlayerPositionUpdate.sender");
+      "GameDataUDP.PlayerPositionUpdate.username");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->sender(), output);
+      1, this->username(), output);
   }
 
   // optional float xPos = 2;
@@ -799,15 +829,15 @@ void PlayerPositionUpdate::SerializeWithCachedSizes(
 ::google::protobuf::uint8* PlayerPositionUpdate::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:GameDataUDP.PlayerPositionUpdate)
-  // optional string sender = 1;
-  if (this->sender().size() > 0) {
+  // optional string username = 1;
+  if (this->username().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->sender().data(), this->sender().length(),
+      this->username().data(), this->username().length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "GameDataUDP.PlayerPositionUpdate.sender");
+      "GameDataUDP.PlayerPositionUpdate.username");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->sender(), target);
+        1, this->username(), target);
   }
 
   // optional float xPos = 2;
@@ -828,11 +858,11 @@ int PlayerPositionUpdate::ByteSize() const {
 // @@protoc_insertion_point(message_byte_size_start:GameDataUDP.PlayerPositionUpdate)
   int total_size = 0;
 
-  // optional string sender = 1;
-  if (this->sender().size() > 0) {
+  // optional string username = 1;
+  if (this->username().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->sender());
+        this->username());
   }
 
   // optional float xPos = 2;
@@ -873,9 +903,9 @@ void PlayerPositionUpdate::MergeFrom(const PlayerPositionUpdate& from) {
   if (GOOGLE_PREDICT_FALSE(&from == this)) {
     ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
   }
-  if (from.sender().size() > 0) {
+  if (from.username().size() > 0) {
 
-    sender_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.sender_);
+    username_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.username_);
   }
   if (from.xpos() != 0) {
     set_xpos(from.xpos());
@@ -909,7 +939,7 @@ void PlayerPositionUpdate::Swap(PlayerPositionUpdate* other) {
   InternalSwap(other);
 }
 void PlayerPositionUpdate::InternalSwap(PlayerPositionUpdate* other) {
-  sender_.Swap(&other->sender_);
+  username_.Swap(&other->username_);
   std::swap(xpos_, other->xpos_);
   std::swap(ypos_, other->ypos_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -927,48 +957,48 @@ void PlayerPositionUpdate::InternalSwap(PlayerPositionUpdate* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // PlayerPositionUpdate
 
-// optional string sender = 1;
-void PlayerPositionUpdate::clear_sender() {
-  sender_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// optional string username = 1;
+void PlayerPositionUpdate::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- const ::std::string& PlayerPositionUpdate::sender() const {
-  // @@protoc_insertion_point(field_get:GameDataUDP.PlayerPositionUpdate.sender)
-  return sender_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+ const ::std::string& PlayerPositionUpdate::username() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.PlayerPositionUpdate.username)
+  return username_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void PlayerPositionUpdate::set_sender(const ::std::string& value) {
+ void PlayerPositionUpdate::set_username(const ::std::string& value) {
   
-  sender_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:GameDataUDP.PlayerPositionUpdate.sender)
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:GameDataUDP.PlayerPositionUpdate.username)
 }
- void PlayerPositionUpdate::set_sender(const char* value) {
+ void PlayerPositionUpdate::set_username(const char* value) {
   
-  sender_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:GameDataUDP.PlayerPositionUpdate.sender)
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:GameDataUDP.PlayerPositionUpdate.username)
 }
- void PlayerPositionUpdate::set_sender(const char* value, size_t size) {
+ void PlayerPositionUpdate::set_username(const char* value, size_t size) {
   
-  sender_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:GameDataUDP.PlayerPositionUpdate.sender)
+  // @@protoc_insertion_point(field_set_pointer:GameDataUDP.PlayerPositionUpdate.username)
 }
- ::std::string* PlayerPositionUpdate::mutable_sender() {
+ ::std::string* PlayerPositionUpdate::mutable_username() {
   
-  // @@protoc_insertion_point(field_mutable:GameDataUDP.PlayerPositionUpdate.sender)
-  return sender_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:GameDataUDP.PlayerPositionUpdate.username)
+  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* PlayerPositionUpdate::release_sender() {
-  // @@protoc_insertion_point(field_release:GameDataUDP.PlayerPositionUpdate.sender)
+ ::std::string* PlayerPositionUpdate::release_username() {
+  // @@protoc_insertion_point(field_release:GameDataUDP.PlayerPositionUpdate.username)
   
-  return sender_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void PlayerPositionUpdate::set_allocated_sender(::std::string* sender) {
-  if (sender != NULL) {
+ void PlayerPositionUpdate::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
     
   } else {
     
   }
-  sender_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), sender);
-  // @@protoc_insertion_point(field_set_allocated:GameDataUDP.PlayerPositionUpdate.sender)
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:GameDataUDP.PlayerPositionUpdate.username)
 }
 
 // optional float xPos = 2;
@@ -997,6 +1027,411 @@ void PlayerPositionUpdate::clear_ypos() {
   
   ypos_ = value;
   // @@protoc_insertion_point(field_set:GameDataUDP.PlayerPositionUpdate.yPos)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PlayerVelcityUpdate::kUsernameFieldNumber;
+const int PlayerVelcityUpdate::kXPosFieldNumber;
+const int PlayerVelcityUpdate::kYPosFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PlayerVelcityUpdate::PlayerVelcityUpdate()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:GameDataUDP.PlayerVelcityUpdate)
+}
+
+void PlayerVelcityUpdate::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+PlayerVelcityUpdate::PlayerVelcityUpdate(const PlayerVelcityUpdate& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:GameDataUDP.PlayerVelcityUpdate)
+}
+
+void PlayerVelcityUpdate::SharedCtor() {
+    _is_default_instance_ = false;
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  username_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  xpos_ = 0;
+  ypos_ = 0;
+}
+
+PlayerVelcityUpdate::~PlayerVelcityUpdate() {
+  // @@protoc_insertion_point(destructor:GameDataUDP.PlayerVelcityUpdate)
+  SharedDtor();
+}
+
+void PlayerVelcityUpdate::SharedDtor() {
+  username_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != default_instance_) {
+  }
+}
+
+void PlayerVelcityUpdate::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* PlayerVelcityUpdate::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return PlayerVelcityUpdate_descriptor_;
+}
+
+const PlayerVelcityUpdate& PlayerVelcityUpdate::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_GameDataUDP_2eproto();
+  return *default_instance_;
+}
+
+PlayerVelcityUpdate* PlayerVelcityUpdate::default_instance_ = NULL;
+
+PlayerVelcityUpdate* PlayerVelcityUpdate::New(::google::protobuf::Arena* arena) const {
+  PlayerVelcityUpdate* n = new PlayerVelcityUpdate;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void PlayerVelcityUpdate::Clear() {
+// @@protoc_insertion_point(message_clear_start:GameDataUDP.PlayerVelcityUpdate)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(PlayerVelcityUpdate, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<PlayerVelcityUpdate*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(xpos_, ypos_);
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+
+#undef ZR_HELPER_
+#undef ZR_
+
+}
+
+bool PlayerVelcityUpdate::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:GameDataUDP.PlayerVelcityUpdate)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional string username = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_username()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->username().data(), this->username().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "GameDataUDP.PlayerVelcityUpdate.username"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(21)) goto parse_xPos;
+        break;
+      }
+
+      // optional float xPos = 2;
+      case 2: {
+        if (tag == 21) {
+         parse_xPos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &xpos_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(29)) goto parse_yPos;
+        break;
+      }
+
+      // optional float yPos = 3;
+      case 3: {
+        if (tag == 29) {
+         parse_yPos:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &ypos_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:GameDataUDP.PlayerVelcityUpdate)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:GameDataUDP.PlayerVelcityUpdate)
+  return false;
+#undef DO_
+}
+
+void PlayerVelcityUpdate::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:GameDataUDP.PlayerVelcityUpdate)
+  // optional string username = 1;
+  if (this->username().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->username().data(), this->username().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "GameDataUDP.PlayerVelcityUpdate.username");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->username(), output);
+  }
+
+  // optional float xPos = 2;
+  if (this->xpos() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->xpos(), output);
+  }
+
+  // optional float yPos = 3;
+  if (this->ypos() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->ypos(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:GameDataUDP.PlayerVelcityUpdate)
+}
+
+::google::protobuf::uint8* PlayerVelcityUpdate::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:GameDataUDP.PlayerVelcityUpdate)
+  // optional string username = 1;
+  if (this->username().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->username().data(), this->username().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "GameDataUDP.PlayerVelcityUpdate.username");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->username(), target);
+  }
+
+  // optional float xPos = 2;
+  if (this->xpos() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(2, this->xpos(), target);
+  }
+
+  // optional float yPos = 3;
+  if (this->ypos() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->ypos(), target);
+  }
+
+  // @@protoc_insertion_point(serialize_to_array_end:GameDataUDP.PlayerVelcityUpdate)
+  return target;
+}
+
+int PlayerVelcityUpdate::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:GameDataUDP.PlayerVelcityUpdate)
+  int total_size = 0;
+
+  // optional string username = 1;
+  if (this->username().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->username());
+  }
+
+  // optional float xPos = 2;
+  if (this->xpos() != 0) {
+    total_size += 1 + 4;
+  }
+
+  // optional float yPos = 3;
+  if (this->ypos() != 0) {
+    total_size += 1 + 4;
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PlayerVelcityUpdate::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:GameDataUDP.PlayerVelcityUpdate)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  const PlayerVelcityUpdate* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const PlayerVelcityUpdate>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:GameDataUDP.PlayerVelcityUpdate)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:GameDataUDP.PlayerVelcityUpdate)
+    MergeFrom(*source);
+  }
+}
+
+void PlayerVelcityUpdate::MergeFrom(const PlayerVelcityUpdate& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:GameDataUDP.PlayerVelcityUpdate)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  if (from.username().size() > 0) {
+
+    username_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.username_);
+  }
+  if (from.xpos() != 0) {
+    set_xpos(from.xpos());
+  }
+  if (from.ypos() != 0) {
+    set_ypos(from.ypos());
+  }
+}
+
+void PlayerVelcityUpdate::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:GameDataUDP.PlayerVelcityUpdate)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PlayerVelcityUpdate::CopyFrom(const PlayerVelcityUpdate& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:GameDataUDP.PlayerVelcityUpdate)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PlayerVelcityUpdate::IsInitialized() const {
+
+  return true;
+}
+
+void PlayerVelcityUpdate::Swap(PlayerVelcityUpdate* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PlayerVelcityUpdate::InternalSwap(PlayerVelcityUpdate* other) {
+  username_.Swap(&other->username_);
+  std::swap(xpos_, other->xpos_);
+  std::swap(ypos_, other->ypos_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata PlayerVelcityUpdate::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = PlayerVelcityUpdate_descriptor_;
+  metadata.reflection = PlayerVelcityUpdate_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// PlayerVelcityUpdate
+
+// optional string username = 1;
+void PlayerVelcityUpdate::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& PlayerVelcityUpdate::username() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.PlayerVelcityUpdate.username)
+  return username_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void PlayerVelcityUpdate::set_username(const ::std::string& value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:GameDataUDP.PlayerVelcityUpdate.username)
+}
+ void PlayerVelcityUpdate::set_username(const char* value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:GameDataUDP.PlayerVelcityUpdate.username)
+}
+ void PlayerVelcityUpdate::set_username(const char* value, size_t size) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:GameDataUDP.PlayerVelcityUpdate.username)
+}
+ ::std::string* PlayerVelcityUpdate::mutable_username() {
+  
+  // @@protoc_insertion_point(field_mutable:GameDataUDP.PlayerVelcityUpdate.username)
+  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* PlayerVelcityUpdate::release_username() {
+  // @@protoc_insertion_point(field_release:GameDataUDP.PlayerVelcityUpdate.username)
+  
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void PlayerVelcityUpdate::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
+    
+  } else {
+    
+  }
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:GameDataUDP.PlayerVelcityUpdate.username)
+}
+
+// optional float xPos = 2;
+void PlayerVelcityUpdate::clear_xpos() {
+  xpos_ = 0;
+}
+ float PlayerVelcityUpdate::xpos() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.PlayerVelcityUpdate.xPos)
+  return xpos_;
+}
+ void PlayerVelcityUpdate::set_xpos(float value) {
+  
+  xpos_ = value;
+  // @@protoc_insertion_point(field_set:GameDataUDP.PlayerVelcityUpdate.xPos)
+}
+
+// optional float yPos = 3;
+void PlayerVelcityUpdate::clear_ypos() {
+  ypos_ = 0;
+}
+ float PlayerVelcityUpdate::ypos() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.PlayerVelcityUpdate.yPos)
+  return ypos_;
+}
+ void PlayerVelcityUpdate::set_ypos(float value) {
+  
+  ypos_ = value;
+  // @@protoc_insertion_point(field_set:GameDataUDP.PlayerVelcityUpdate.yPos)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -1793,6 +2228,7 @@ void CollisionUpdate::clear_object() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int DataMessage::kKeyPressFieldNumber;
 const int DataMessage::kPlayerPosUpdateFieldNumber;
+const int DataMessage::kPlayerVelocityUpdateFieldNumber;
 const int DataMessage::kBulletPosUpdateFieldNumber;
 const int DataMessage::kCollisionUpdateFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -1807,6 +2243,7 @@ void DataMessage::InitAsDefaultInstance() {
   _is_default_instance_ = true;
   keypress_ = const_cast< ::GameDataUDP::KeyPress*>(&::GameDataUDP::KeyPress::default_instance());
   playerposupdate_ = const_cast< ::GameDataUDP::PlayerPositionUpdate*>(&::GameDataUDP::PlayerPositionUpdate::default_instance());
+  playervelocityupdate_ = const_cast< ::GameDataUDP::PlayerVelcityUpdate*>(&::GameDataUDP::PlayerVelcityUpdate::default_instance());
   bulletposupdate_ = const_cast< ::GameDataUDP::BulletPositionUpdate*>(&::GameDataUDP::BulletPositionUpdate::default_instance());
   collisionupdate_ = const_cast< ::GameDataUDP::CollisionUpdate*>(&::GameDataUDP::CollisionUpdate::default_instance());
 }
@@ -1824,6 +2261,7 @@ void DataMessage::SharedCtor() {
   _cached_size_ = 0;
   keypress_ = NULL;
   playerposupdate_ = NULL;
+  playervelocityupdate_ = NULL;
   bulletposupdate_ = NULL;
   collisionupdate_ = NULL;
 }
@@ -1837,6 +2275,7 @@ void DataMessage::SharedDtor() {
   if (this != default_instance_) {
     delete keypress_;
     delete playerposupdate_;
+    delete playervelocityupdate_;
     delete bulletposupdate_;
     delete collisionupdate_;
   }
@@ -1873,6 +2312,8 @@ void DataMessage::Clear() {
   keypress_ = NULL;
   if (GetArenaNoVirtual() == NULL && playerposupdate_ != NULL) delete playerposupdate_;
   playerposupdate_ = NULL;
+  if (GetArenaNoVirtual() == NULL && playervelocityupdate_ != NULL) delete playervelocityupdate_;
+  playervelocityupdate_ = NULL;
   if (GetArenaNoVirtual() == NULL && bulletposupdate_ != NULL) delete bulletposupdate_;
   bulletposupdate_ = NULL;
   if (GetArenaNoVirtual() == NULL && collisionupdate_ != NULL) delete collisionupdate_;
@@ -1910,26 +2351,39 @@ bool DataMessage::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_bulletPosUpdate;
+        if (input->ExpectTag(26)) goto parse_playerVelocityUpdate;
         break;
       }
 
-      // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 3;
+      // optional .GameDataUDP.PlayerVelcityUpdate playerVelocityUpdate = 3;
       case 3: {
         if (tag == 26) {
+         parse_playerVelocityUpdate:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_playervelocityupdate()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_bulletPosUpdate;
+        break;
+      }
+
+      // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 4;
+      case 4: {
+        if (tag == 34) {
          parse_bulletPosUpdate:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_bulletposupdate()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(34)) goto parse_collisionUpdate;
+        if (input->ExpectTag(42)) goto parse_collisionUpdate;
         break;
       }
 
-      // optional .GameDataUDP.CollisionUpdate collisionUpdate = 4;
-      case 4: {
-        if (tag == 34) {
+      // optional .GameDataUDP.CollisionUpdate collisionUpdate = 5;
+      case 5: {
+        if (tag == 42) {
          parse_collisionUpdate:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_collisionupdate()));
@@ -1976,16 +2430,22 @@ void DataMessage::SerializeWithCachedSizes(
       2, *this->playerposupdate_, output);
   }
 
-  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 3;
-  if (this->has_bulletposupdate()) {
+  // optional .GameDataUDP.PlayerVelcityUpdate playerVelocityUpdate = 3;
+  if (this->has_playervelocityupdate()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, *this->bulletposupdate_, output);
+      3, *this->playervelocityupdate_, output);
   }
 
-  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 4;
+  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 4;
+  if (this->has_bulletposupdate()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, *this->bulletposupdate_, output);
+  }
+
+  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 5;
   if (this->has_collisionupdate()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, *this->collisionupdate_, output);
+      5, *this->collisionupdate_, output);
   }
 
   // @@protoc_insertion_point(serialize_end:GameDataUDP.DataMessage)
@@ -2008,18 +2468,25 @@ void DataMessage::SerializeWithCachedSizes(
         2, *this->playerposupdate_, false, target);
   }
 
-  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 3;
+  // optional .GameDataUDP.PlayerVelcityUpdate playerVelocityUpdate = 3;
+  if (this->has_playervelocityupdate()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageNoVirtualToArray(
+        3, *this->playervelocityupdate_, false, target);
+  }
+
+  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 4;
   if (this->has_bulletposupdate()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        3, *this->bulletposupdate_, false, target);
+        4, *this->bulletposupdate_, false, target);
   }
 
-  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 4;
+  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 5;
   if (this->has_collisionupdate()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        4, *this->collisionupdate_, false, target);
+        5, *this->collisionupdate_, false, target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:GameDataUDP.DataMessage)
@@ -2044,14 +2511,21 @@ int DataMessage::ByteSize() const {
         *this->playerposupdate_);
   }
 
-  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 3;
+  // optional .GameDataUDP.PlayerVelcityUpdate playerVelocityUpdate = 3;
+  if (this->has_playervelocityupdate()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        *this->playervelocityupdate_);
+  }
+
+  // optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 4;
   if (this->has_bulletposupdate()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
         *this->bulletposupdate_);
   }
 
-  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 4;
+  // optional .GameDataUDP.CollisionUpdate collisionUpdate = 5;
   if (this->has_collisionupdate()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -2092,6 +2566,9 @@ void DataMessage::MergeFrom(const DataMessage& from) {
   if (from.has_playerposupdate()) {
     mutable_playerposupdate()->::GameDataUDP::PlayerPositionUpdate::MergeFrom(from.playerposupdate());
   }
+  if (from.has_playervelocityupdate()) {
+    mutable_playervelocityupdate()->::GameDataUDP::PlayerVelcityUpdate::MergeFrom(from.playervelocityupdate());
+  }
   if (from.has_bulletposupdate()) {
     mutable_bulletposupdate()->::GameDataUDP::BulletPositionUpdate::MergeFrom(from.bulletposupdate());
   }
@@ -2126,6 +2603,7 @@ void DataMessage::Swap(DataMessage* other) {
 void DataMessage::InternalSwap(DataMessage* other) {
   std::swap(keypress_, other->keypress_);
   std::swap(playerposupdate_, other->playerposupdate_);
+  std::swap(playervelocityupdate_, other->playervelocityupdate_);
   std::swap(bulletposupdate_, other->bulletposupdate_);
   std::swap(collisionupdate_, other->collisionupdate_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -2219,7 +2697,45 @@ void DataMessage::set_allocated_playerposupdate(::GameDataUDP::PlayerPositionUpd
   // @@protoc_insertion_point(field_set_allocated:GameDataUDP.DataMessage.playerPosUpdate)
 }
 
-// optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 3;
+// optional .GameDataUDP.PlayerVelcityUpdate playerVelocityUpdate = 3;
+bool DataMessage::has_playervelocityupdate() const {
+  return !_is_default_instance_ && playervelocityupdate_ != NULL;
+}
+void DataMessage::clear_playervelocityupdate() {
+  if (GetArenaNoVirtual() == NULL && playervelocityupdate_ != NULL) delete playervelocityupdate_;
+  playervelocityupdate_ = NULL;
+}
+const ::GameDataUDP::PlayerVelcityUpdate& DataMessage::playervelocityupdate() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.DataMessage.playerVelocityUpdate)
+  return playervelocityupdate_ != NULL ? *playervelocityupdate_ : *default_instance_->playervelocityupdate_;
+}
+::GameDataUDP::PlayerVelcityUpdate* DataMessage::mutable_playervelocityupdate() {
+  
+  if (playervelocityupdate_ == NULL) {
+    playervelocityupdate_ = new ::GameDataUDP::PlayerVelcityUpdate;
+  }
+  // @@protoc_insertion_point(field_mutable:GameDataUDP.DataMessage.playerVelocityUpdate)
+  return playervelocityupdate_;
+}
+::GameDataUDP::PlayerVelcityUpdate* DataMessage::release_playervelocityupdate() {
+  // @@protoc_insertion_point(field_release:GameDataUDP.DataMessage.playerVelocityUpdate)
+  
+  ::GameDataUDP::PlayerVelcityUpdate* temp = playervelocityupdate_;
+  playervelocityupdate_ = NULL;
+  return temp;
+}
+void DataMessage::set_allocated_playervelocityupdate(::GameDataUDP::PlayerVelcityUpdate* playervelocityupdate) {
+  delete playervelocityupdate_;
+  playervelocityupdate_ = playervelocityupdate;
+  if (playervelocityupdate) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_set_allocated:GameDataUDP.DataMessage.playerVelocityUpdate)
+}
+
+// optional .GameDataUDP.BulletPositionUpdate bulletPosUpdate = 4;
 bool DataMessage::has_bulletposupdate() const {
   return !_is_default_instance_ && bulletposupdate_ != NULL;
 }
@@ -2257,7 +2773,7 @@ void DataMessage::set_allocated_bulletposupdate(::GameDataUDP::BulletPositionUpd
   // @@protoc_insertion_point(field_set_allocated:GameDataUDP.DataMessage.bulletPosUpdate)
 }
 
-// optional .GameDataUDP.CollisionUpdate collisionUpdate = 4;
+// optional .GameDataUDP.CollisionUpdate collisionUpdate = 5;
 bool DataMessage::has_collisionupdate() const {
   return !_is_default_instance_ && collisionupdate_ != NULL;
 }

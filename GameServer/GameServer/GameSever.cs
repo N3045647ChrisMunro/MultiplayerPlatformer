@@ -498,15 +498,41 @@ namespace GameServer
                     GameDataUDP.DataMessage protoData = new GameDataUDP.DataMessage();
                     protoData = GameDataUDP.DataMessage.Parser.ParseFrom(msg);
 
+                    //Check the Datamsg for a Key Press Message
+                    if(protoData.KeyPress != null)
+                    {
+                        Console.WriteLine("Recieved UDP: {0}", protoData.KeyPress.ToString());
+                        string username_ = protoData.KeyPress.Username.ToString();
+                        //Create a Response Message
+                        GameDataUDP.DataMessage responseData = new GameDataUDP.DataMessage();
+                        GameDataUDP.PlayerVelcityUpdate vel = new GameDataUDP.PlayerVelcityUpdate();
+
+                        vel.Username = username_;
+                        vel.YPos = 10;
+
+                        responseData.PlayerVelocityUpdate = vel;
+
+                        // Give the Player 10 Velocity in the Y axis
+                        //responseData.PlayerVelocityUpdate.Username = username_;
+                        //responseData.PlayerVelocityUpdate.YPos = 10;
+
+                        byte[] messageBuffer = responseData.ToByteArray();
+                        //Add to send Queue
+                        addMsgToUDPSendQueue(messageBuffer);
+                    }
+                    //Check for Velocity Updates
                     if (protoData.PlayerPosUpdate != null)
                     {
                         Console.WriteLine("Recieved UDP: {0}", protoData.PlayerPosUpdate.ToString());
+
+                        GameDataUDP.DataMessage responseData = new GameDataUDP.DataMessage();
 
                         //Broadcast the position Update to all players
                         byte[] messageBuffer = protoData.ToByteArray();
                         //Add to send Queue
                         addMsgToUDPSendQueue(messageBuffer);
                     }
+                    
                 }
             }
         }

@@ -184,13 +184,8 @@ void Player::update(sf::Event event, float dt)
 	if (walkTileY_ > 1) {
 		walkTileY_ = 0;
 	}
-
+	
 	//Update player velocity and positions
-
-	//Cap max Y velocity
-	//if (velocity_.y <= -10)
-		//velocity_.y = -10;
-
 	playerPos_.x = playerCollisionBox_.getBody()->GetPosition().x * PPM; //dt * velocity_.x;
 	playerPos_.y = playerCollisionBox_.getBody()->GetPosition().y * PPM; //dt * velocity_.y;
 	pSprite_.setPosition(playerPos_);

@@ -47,6 +47,7 @@ private:
 	void recvUDPMessage();
 
 	void sendUDPMessage();
+	void handleUDPMessage();
 
 	void startClient();
 	void unReg();
@@ -54,13 +55,13 @@ private:
 
 	void updatePosMessage();
 	std::queue<std::string> udpMsgSendQueue_;
-	std::queue<std::string> udpMsgRecvQueue_;
+	std::queue<GameDataUDP::DataMessage *> udpMsgRecvQueue_;
 
 	std::string getSendMessage();
 	void addMsgToSendQueue(std::string msg);
 
-	std::string getRecvMessage();
-	void addMsgToRecvQueue(std::string msg);
+	GameDataUDP::DataMessage* getRecvMessage();
+	void addMsgToRecvQueue(GameDataUDP::DataMessage &dataMsg);
 
 	void spacePressed();
 
@@ -88,6 +89,7 @@ private:
 	std::string username_;
 	Player *player_{ nullptr };
 	std::vector<Enemy *> enemies_{ nullptr };
+	int enemyActiveCount_ = 0;
 	int enemiesIDXTracker_ = 0;
 
 };

@@ -49,10 +49,10 @@ void Enemy::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 void Enemy::update(float dt)
 {
-	enemyPos_.x = enemyCollisionBox_.getBody()->GetPosition().x * PPM; //dt * velocity_.x;
-	enemyPos_.y = enemyCollisionBox_.getBody()->GetPosition().y * PPM; //dt * velocity_.y;
+	//enemyPos_.x = enemyCollisionBox_.getBody()->GetPosition().x * PPM; //dt * velocity_.x;
+	//enemyPos_.y = enemyCollisionBox_.getBody()->GetPosition().y * PPM; //dt * velocity_.y;
 
-	enemyCollisionBox_.getBody()->SetLinearVelocity(b2Vec2(enemyVelocity_.x, enemyVelocity_.y));
+	//enemyCollisionBox_.getBody()->SetLinearVelocity(b2Vec2(enemyVelocity_.x, enemyVelocity_.y));
 
 	colBox_.setPosition(enemyPos_);
 }

@@ -47,7 +47,6 @@ bool GameState::createWorld()
 		//Create / Initialize the Player
 		player_ = new Player();
 		player_->createSprite(world_);
-		player_->setUsername(username_);
 
 		const int MAX_ENEMIES = 10;
 		enemies_.clear();
@@ -88,6 +87,7 @@ void GameState::updateWorld()
 	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
 
 	std::thread udp_sendThread(&GameState::sendUDPMessage, this);
+	std::thread udp_handleMsg(&GameState::handleUDPMessage, this);
 
 	sf::Vector2f tempPos = player_->getPosition();
 
@@ -110,15 +110,16 @@ void GameState::updateWorld()
 				if (event.key.code == sf::Keyboard::Space) {
 
 					//Send SpaceKey press Msg to server
+					//spacePressed();
 				}
 			}
 		}
 
-		//if (player_->getPosition() != tempPos) {
-		//	updatePosMessage();
+		if (player_->getPosition() != tempPos) {
+			updatePosMessage();
 
-		//	tempPos = player_->getPosition();
-		//}
+			tempPos = player_->getPosition();
+		}
 
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
@@ -129,7 +130,6 @@ void GameState::updateWorld()
 
 		if (enemies_.size() > 0) {
 			for (auto e : enemies_) {
-				std::cout << "EPos: " << e->getPosition().x << ", " << e->getPosition().y << std::endl;
 				if (e->isAlive()) {
 					window_->draw(*e);
 					e->update(deltaTime.asSeconds());
@@ -149,6 +149,7 @@ void GameState::updateWorld()
 	udp_recvThread.join();
 
 	udp_sendThread.join();
+	udp_handleMsg.join();
 }
 
 //Clean and "free up" Memory
@@ -233,13 +234,14 @@ void GameState::recvUDPMessage()
 			GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
 
 			dataMsg = udpNetwork_.receiveData();
+			addMsgToRecvQueue(*dataMsg);
 
-			if (dataMsg->has_playerposupdate()) {
-				std::cout << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
-			}
-			else {
-				std::cout << "UDP Proto: pos update is null" << std::endl;
-			}
+			//if (dataMsg->has_playerposupdate()) {
+			//	std::cout << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
+			//}
+			//if (dataMsg->has_playervelocityupdate()) {
+			//	std::cout << dataMsg->playervelocityupdate().xpos() << ", " << dataMsg->playervelocityupdate().ypos() << std::endl;
+			//}
 		}
 		else
 			std::cerr << "Error: Connection Lost (UDP)" << std::endl;
@@ -254,6 +256,49 @@ void GameState::sendUDPMessage()
 
 		if (messageToSend.size() > 0) {
 			udpNetwork_.sendData(messageToSend);
+		}
+	}
+}
+
+void GameState::handleUDPMessage()
+{
+	while (true) {
+		GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+
+		std::string playerUserName = player_->getUsername();
+
+		dataMsg = getRecvMessage();
+		if (dataMsg != nullptr) {
+
+			//check if the message is a POSITION UPDDATE
+
+			if (dataMsg->has_playerposupdate()) {
+
+				std::string who = dataMsg->playerposupdate().username();
+				if (dataMsg->playerposupdate().username() != playerUserName) {
+					std::cout << who << ", " << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
+
+					if (enemyActiveCount_ > 0) {
+
+						for (auto e : enemies_) {
+							if (e->isAlive() && e->getUserName() == who) {
+								std::cout << "update " << who << " pos" << std::endl;
+							}
+						}
+
+					}
+
+				}
+				else {
+					//std::cout << "You moved" << std::endl;
+				}
+
+				
+			}
+			if (dataMsg->has_playervelocityupdate()) {
+				//std::cout << dataMsg->playervelocityupdate().xpos() << ", " << dataMsg->playervelocityupdate().ypos() << std::endl;
+			}
+
 		}
 	}
 }
@@ -295,7 +340,7 @@ void GameState::startClient()
 		std::cin >> pass;
 
 		std::cout << std::endl;
-		username_ = name;
+		player_->setUsername(name);
 
 		regData->set_username(name);
 		regData->set_password(pass);
@@ -325,6 +370,8 @@ void GameState::startClient()
 						if (status == "oldClients") {
 							enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
 							enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
+							enemies_[i - 1]->setEnemyPos(sf::Vector2f(300, 200));
+							enemyActiveCount_++;
 
 							std::cout << enemies_[i - 1]->getUserName() << std::endl;
 						}
@@ -335,13 +382,6 @@ void GameState::startClient()
 				std::cout << "Sorry That Username is Taken" << std::endl;
 				startClient();
 			}
-			//else if (status == "oldClients")
-			//{
-			//	enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
-			//	enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
-			//	
-			//	dataMsg->Clear();
-			//}
 
 		}
 		break;
@@ -425,6 +465,7 @@ void GameState::updatePosMessage()
 	GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
 	GameDataUDP::PlayerPositionUpdate* posData = new GameDataUDP::PlayerPositionUpdate();
 
+	posData->set_username(player_->getUsername());
 	posData->set_xpos(player_->getPosition().x);
 	posData->set_ypos(player_->getPosition().y);
 	dataMsg->set_allocated_playerposupdate(posData);
@@ -453,7 +494,7 @@ std::string GameState::getSendMessage()
 }
 
 void GameState::addMsgToSendQueue(std::string msg)
-{
+   {
 	threadMutex_.lock();
 
 	udpMsgSendQueue_.push(msg);
@@ -461,13 +502,29 @@ void GameState::addMsgToSendQueue(std::string msg)
 	threadMutex_.unlock();
 }
 
-std::string GameState::getRecvMessage()
+GameDataUDP::DataMessage* GameState::getRecvMessage()
 {
-	return std::string();
+	if (udpMsgRecvQueue_.size() > 0) {
+
+		threadMutex_.lock();
+
+		GameDataUDP::DataMessage *message = udpMsgRecvQueue_.front();
+		udpMsgRecvQueue_.pop();
+
+		threadMutex_.unlock();
+
+		return message;
+	}
+	return nullptr;
 }
 
-void GameState::addMsgToRecvQueue(std::string msg)
+void GameState::addMsgToRecvQueue(GameDataUDP::DataMessage &dataMsg)
 {
+	threadMutex_.lock();
+
+	udpMsgRecvQueue_.push(&dataMsg);
+
+	threadMutex_.unlock();
 }
 
 void GameState::spacePressed()
@@ -476,7 +533,8 @@ void GameState::spacePressed()
 
 	GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
 
-	keyMsg->set_key = "Space";
+	keyMsg->set_username(player_->getUsername());
+	keyMsg->set_key("Space");
 
 	dataMsg->set_allocated_keypress(keyMsg);
 
