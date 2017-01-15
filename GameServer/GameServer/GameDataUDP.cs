@@ -22,25 +22,36 @@ namespace GameDataUDP {
     static GameDataUDPReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFHYW1lRGF0YVVEUC5wcm90bxILR2FtZURhdGFVRFAiLAoOUG9zaXRpb25V",
-            "cGRhdGUSDAoEeFBvcxgBIAEoAhIMCgR5UG9zGAIgASgCIkIKC0RhdGFNZXNz",
-            "YWdlEjMKDnBvc2l0aW9uVXBkYXRlGAEgASgLMhsuR2FtZURhdGFVRFAuUG9z",
-            "aXRpb25VcGRhdGViBnByb3RvMw=="));
+            "ChFHYW1lRGF0YVVEUC5wcm90bxILR2FtZURhdGFVRFAiKQoIS2V5UHJlc3MS",
+            "EAoIdXNlcm5hbWUYASABKAkSCwoDa2V5GAIgASgJIkIKFFBsYXllclBvc2l0",
+            "aW9uVXBkYXRlEg4KBnNlbmRlchgBIAEoCRIMCgR4UG9zGAIgASgCEgwKBHlQ",
+            "b3MYAyABKAIiQQoUQnVsbGV0UG9zaXRpb25VcGRhdGUSDQoFb3duZXIYASAB",
+            "KAkSDAoEeFBvcxgCIAEoAhIMCgR5UG9zGAMgASgCIjQKD0NvbGxpc2lvblVw",
+            "ZGF0ZRIRCglwbGF5ZXJIaXQYASABKAkSDgoGb2JqZWN0GAIgASgJIuUBCgtE",
+            "YXRhTWVzc2FnZRInCghrZXlQcmVzcxgBIAEoCzIVLkdhbWVEYXRhVURQLktl",
+            "eVByZXNzEjoKD3BsYXllclBvc1VwZGF0ZRgCIAEoCzIhLkdhbWVEYXRhVURQ",
+            "LlBsYXllclBvc2l0aW9uVXBkYXRlEjoKD2J1bGxldFBvc1VwZGF0ZRgDIAEo",
+            "CzIhLkdhbWVEYXRhVURQLkJ1bGxldFBvc2l0aW9uVXBkYXRlEjUKD2NvbGxp",
+            "c2lvblVwZGF0ZRgEIAEoCzIcLkdhbWVEYXRhVURQLkNvbGxpc2lvblVwZGF0",
+            "ZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.PositionUpdate), global::GameDataUDP.PositionUpdate.Parser, new[]{ "XPos", "YPos" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.DataMessage), global::GameDataUDP.DataMessage.Parser, new[]{ "PositionUpdate" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.KeyPress), global::GameDataUDP.KeyPress.Parser, new[]{ "Username", "Key" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.PlayerPositionUpdate), global::GameDataUDP.PlayerPositionUpdate.Parser, new[]{ "Sender", "XPos", "YPos" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.BulletPositionUpdate), global::GameDataUDP.BulletPositionUpdate.Parser, new[]{ "Owner", "XPos", "YPos" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.CollisionUpdate), global::GameDataUDP.CollisionUpdate.Parser, new[]{ "PlayerHit", "Object" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.DataMessage), global::GameDataUDP.DataMessage.Parser, new[]{ "KeyPress", "PlayerPosUpdate", "BulletPosUpdate", "CollisionUpdate" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
-  public sealed partial class PositionUpdate : pb::IMessage<PositionUpdate> {
-    private static readonly pb::MessageParser<PositionUpdate> _parser = new pb::MessageParser<PositionUpdate>(() => new PositionUpdate());
+  public sealed partial class KeyPress : pb::IMessage<KeyPress> {
+    private static readonly pb::MessageParser<KeyPress> _parser = new pb::MessageParser<KeyPress>(() => new KeyPress());
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<PositionUpdate> Parser { get { return _parser; } }
+    public static pb::MessageParser<KeyPress> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -53,25 +64,182 @@ namespace GameDataUDP {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PositionUpdate() {
+    public KeyPress() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PositionUpdate(PositionUpdate other) : this() {
+    public KeyPress(KeyPress other) : this() {
+      username_ = other.username_;
+      key_ = other.key_;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public KeyPress Clone() {
+      return new KeyPress(this);
+    }
+
+    /// <summary>Field number for the "username" field.</summary>
+    public const int UsernameFieldNumber = 1;
+    private string username_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Username {
+      get { return username_; }
+      set {
+        username_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "key" field.</summary>
+    public const int KeyFieldNumber = 2;
+    private string key_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Key {
+      get { return key_; }
+      set {
+        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as KeyPress);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(KeyPress other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Username != other.Username) return false;
+      if (Key != other.Key) return false;
+      return true;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Username.Length != 0) hash ^= Username.GetHashCode();
+      if (Key.Length != 0) hash ^= Key.GetHashCode();
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Username.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Username);
+      }
+      if (Key.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Key);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Username.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Username);
+      }
+      if (Key.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(KeyPress other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Username.Length != 0) {
+        Username = other.Username;
+      }
+      if (other.Key.Length != 0) {
+        Key = other.Key;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 10: {
+            Username = input.ReadString();
+            break;
+          }
+          case 18: {
+            Key = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class PlayerPositionUpdate : pb::IMessage<PlayerPositionUpdate> {
+    private static readonly pb::MessageParser<PlayerPositionUpdate> _parser = new pb::MessageParser<PlayerPositionUpdate>(() => new PlayerPositionUpdate());
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<PlayerPositionUpdate> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::GameDataUDP.GameDataUDPReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PlayerPositionUpdate() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PlayerPositionUpdate(PlayerPositionUpdate other) : this() {
+      sender_ = other.sender_;
       xPos_ = other.xPos_;
       yPos_ = other.yPos_;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PositionUpdate Clone() {
-      return new PositionUpdate(this);
+    public PlayerPositionUpdate Clone() {
+      return new PlayerPositionUpdate(this);
+    }
+
+    /// <summary>Field number for the "sender" field.</summary>
+    public const int SenderFieldNumber = 1;
+    private string sender_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Sender {
+      get { return sender_; }
+      set {
+        sender_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
     }
 
     /// <summary>Field number for the "xPos" field.</summary>
-    public const int XPosFieldNumber = 1;
+    public const int XPosFieldNumber = 2;
     private float xPos_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public float XPos {
@@ -82,7 +250,7 @@ namespace GameDataUDP {
     }
 
     /// <summary>Field number for the "yPos" field.</summary>
-    public const int YPosFieldNumber = 2;
+    public const int YPosFieldNumber = 3;
     private float yPos_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public float YPos {
@@ -94,17 +262,18 @@ namespace GameDataUDP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as PositionUpdate);
+      return Equals(other as PlayerPositionUpdate);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(PositionUpdate other) {
+    public bool Equals(PlayerPositionUpdate other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Sender != other.Sender) return false;
       if (XPos != other.XPos) return false;
       if (YPos != other.YPos) return false;
       return true;
@@ -113,6 +282,7 @@ namespace GameDataUDP {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Sender.Length != 0) hash ^= Sender.GetHashCode();
       if (XPos != 0F) hash ^= XPos.GetHashCode();
       if (YPos != 0F) hash ^= YPos.GetHashCode();
       return hash;
@@ -125,12 +295,16 @@ namespace GameDataUDP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
+      if (Sender.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Sender);
+      }
       if (XPos != 0F) {
-        output.WriteRawTag(13);
+        output.WriteRawTag(21);
         output.WriteFloat(XPos);
       }
       if (YPos != 0F) {
-        output.WriteRawTag(21);
+        output.WriteRawTag(29);
         output.WriteFloat(YPos);
       }
     }
@@ -138,6 +312,9 @@ namespace GameDataUDP {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Sender.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Sender);
+      }
       if (XPos != 0F) {
         size += 1 + 4;
       }
@@ -148,9 +325,12 @@ namespace GameDataUDP {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(PositionUpdate other) {
+    public void MergeFrom(PlayerPositionUpdate other) {
       if (other == null) {
         return;
+      }
+      if (other.Sender.Length != 0) {
+        Sender = other.Sender;
       }
       if (other.XPos != 0F) {
         XPos = other.XPos;
@@ -168,12 +348,334 @@ namespace GameDataUDP {
           default:
             input.SkipLastField();
             break;
-          case 13: {
-            XPos = input.ReadFloat();
+          case 10: {
+            Sender = input.ReadString();
             break;
           }
           case 21: {
+            XPos = input.ReadFloat();
+            break;
+          }
+          case 29: {
             YPos = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class BulletPositionUpdate : pb::IMessage<BulletPositionUpdate> {
+    private static readonly pb::MessageParser<BulletPositionUpdate> _parser = new pb::MessageParser<BulletPositionUpdate>(() => new BulletPositionUpdate());
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<BulletPositionUpdate> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::GameDataUDP.GameDataUDPReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public BulletPositionUpdate() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public BulletPositionUpdate(BulletPositionUpdate other) : this() {
+      owner_ = other.owner_;
+      xPos_ = other.xPos_;
+      yPos_ = other.yPos_;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public BulletPositionUpdate Clone() {
+      return new BulletPositionUpdate(this);
+    }
+
+    /// <summary>Field number for the "owner" field.</summary>
+    public const int OwnerFieldNumber = 1;
+    private string owner_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Owner {
+      get { return owner_; }
+      set {
+        owner_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "xPos" field.</summary>
+    public const int XPosFieldNumber = 2;
+    private float xPos_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float XPos {
+      get { return xPos_; }
+      set {
+        xPos_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "yPos" field.</summary>
+    public const int YPosFieldNumber = 3;
+    private float yPos_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float YPos {
+      get { return yPos_; }
+      set {
+        yPos_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as BulletPositionUpdate);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(BulletPositionUpdate other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Owner != other.Owner) return false;
+      if (XPos != other.XPos) return false;
+      if (YPos != other.YPos) return false;
+      return true;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Owner.Length != 0) hash ^= Owner.GetHashCode();
+      if (XPos != 0F) hash ^= XPos.GetHashCode();
+      if (YPos != 0F) hash ^= YPos.GetHashCode();
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Owner.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Owner);
+      }
+      if (XPos != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(XPos);
+      }
+      if (YPos != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(YPos);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Owner.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Owner);
+      }
+      if (XPos != 0F) {
+        size += 1 + 4;
+      }
+      if (YPos != 0F) {
+        size += 1 + 4;
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(BulletPositionUpdate other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Owner.Length != 0) {
+        Owner = other.Owner;
+      }
+      if (other.XPos != 0F) {
+        XPos = other.XPos;
+      }
+      if (other.YPos != 0F) {
+        YPos = other.YPos;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 10: {
+            Owner = input.ReadString();
+            break;
+          }
+          case 21: {
+            XPos = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            YPos = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class CollisionUpdate : pb::IMessage<CollisionUpdate> {
+    private static readonly pb::MessageParser<CollisionUpdate> _parser = new pb::MessageParser<CollisionUpdate>(() => new CollisionUpdate());
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<CollisionUpdate> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::GameDataUDP.GameDataUDPReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CollisionUpdate() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CollisionUpdate(CollisionUpdate other) : this() {
+      playerHit_ = other.playerHit_;
+      object_ = other.object_;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CollisionUpdate Clone() {
+      return new CollisionUpdate(this);
+    }
+
+    /// <summary>Field number for the "playerHit" field.</summary>
+    public const int PlayerHitFieldNumber = 1;
+    private string playerHit_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string PlayerHit {
+      get { return playerHit_; }
+      set {
+        playerHit_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "object" field.</summary>
+    public const int ObjectFieldNumber = 2;
+    private string object_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Object {
+      get { return object_; }
+      set {
+        object_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as CollisionUpdate);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(CollisionUpdate other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (PlayerHit != other.PlayerHit) return false;
+      if (Object != other.Object) return false;
+      return true;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (PlayerHit.Length != 0) hash ^= PlayerHit.GetHashCode();
+      if (Object.Length != 0) hash ^= Object.GetHashCode();
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (PlayerHit.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(PlayerHit);
+      }
+      if (Object.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Object);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (PlayerHit.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(PlayerHit);
+      }
+      if (Object.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Object);
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(CollisionUpdate other) {
+      if (other == null) {
+        return;
+      }
+      if (other.PlayerHit.Length != 0) {
+        PlayerHit = other.PlayerHit;
+      }
+      if (other.Object.Length != 0) {
+        Object = other.Object;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 10: {
+            PlayerHit = input.ReadString();
+            break;
+          }
+          case 18: {
+            Object = input.ReadString();
             break;
           }
         }
@@ -189,7 +691,7 @@ namespace GameDataUDP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::GameDataUDP.GameDataUDPReflection.Descriptor.MessageTypes[1]; }
+      get { return global::GameDataUDP.GameDataUDPReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -206,7 +708,10 @@ namespace GameDataUDP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public DataMessage(DataMessage other) : this() {
-      PositionUpdate = other.positionUpdate_ != null ? other.PositionUpdate.Clone() : null;
+      KeyPress = other.keyPress_ != null ? other.KeyPress.Clone() : null;
+      PlayerPosUpdate = other.playerPosUpdate_ != null ? other.PlayerPosUpdate.Clone() : null;
+      BulletPosUpdate = other.bulletPosUpdate_ != null ? other.BulletPosUpdate.Clone() : null;
+      CollisionUpdate = other.collisionUpdate_ != null ? other.CollisionUpdate.Clone() : null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -214,14 +719,47 @@ namespace GameDataUDP {
       return new DataMessage(this);
     }
 
-    /// <summary>Field number for the "positionUpdate" field.</summary>
-    public const int PositionUpdateFieldNumber = 1;
-    private global::GameDataUDP.PositionUpdate positionUpdate_;
+    /// <summary>Field number for the "keyPress" field.</summary>
+    public const int KeyPressFieldNumber = 1;
+    private global::GameDataUDP.KeyPress keyPress_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::GameDataUDP.PositionUpdate PositionUpdate {
-      get { return positionUpdate_; }
+    public global::GameDataUDP.KeyPress KeyPress {
+      get { return keyPress_; }
       set {
-        positionUpdate_ = value;
+        keyPress_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "playerPosUpdate" field.</summary>
+    public const int PlayerPosUpdateFieldNumber = 2;
+    private global::GameDataUDP.PlayerPositionUpdate playerPosUpdate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::GameDataUDP.PlayerPositionUpdate PlayerPosUpdate {
+      get { return playerPosUpdate_; }
+      set {
+        playerPosUpdate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bulletPosUpdate" field.</summary>
+    public const int BulletPosUpdateFieldNumber = 3;
+    private global::GameDataUDP.BulletPositionUpdate bulletPosUpdate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::GameDataUDP.BulletPositionUpdate BulletPosUpdate {
+      get { return bulletPosUpdate_; }
+      set {
+        bulletPosUpdate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "collisionUpdate" field.</summary>
+    public const int CollisionUpdateFieldNumber = 4;
+    private global::GameDataUDP.CollisionUpdate collisionUpdate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::GameDataUDP.CollisionUpdate CollisionUpdate {
+      get { return collisionUpdate_; }
+      set {
+        collisionUpdate_ = value;
       }
     }
 
@@ -238,14 +776,20 @@ namespace GameDataUDP {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (!object.Equals(PositionUpdate, other.PositionUpdate)) return false;
+      if (!object.Equals(KeyPress, other.KeyPress)) return false;
+      if (!object.Equals(PlayerPosUpdate, other.PlayerPosUpdate)) return false;
+      if (!object.Equals(BulletPosUpdate, other.BulletPosUpdate)) return false;
+      if (!object.Equals(CollisionUpdate, other.CollisionUpdate)) return false;
       return true;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (positionUpdate_ != null) hash ^= PositionUpdate.GetHashCode();
+      if (keyPress_ != null) hash ^= KeyPress.GetHashCode();
+      if (playerPosUpdate_ != null) hash ^= PlayerPosUpdate.GetHashCode();
+      if (bulletPosUpdate_ != null) hash ^= BulletPosUpdate.GetHashCode();
+      if (collisionUpdate_ != null) hash ^= CollisionUpdate.GetHashCode();
       return hash;
     }
 
@@ -256,17 +800,38 @@ namespace GameDataUDP {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (positionUpdate_ != null) {
+      if (keyPress_ != null) {
         output.WriteRawTag(10);
-        output.WriteMessage(PositionUpdate);
+        output.WriteMessage(KeyPress);
+      }
+      if (playerPosUpdate_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(PlayerPosUpdate);
+      }
+      if (bulletPosUpdate_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(BulletPosUpdate);
+      }
+      if (collisionUpdate_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(CollisionUpdate);
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (positionUpdate_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(PositionUpdate);
+      if (keyPress_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(KeyPress);
+      }
+      if (playerPosUpdate_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(PlayerPosUpdate);
+      }
+      if (bulletPosUpdate_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(BulletPosUpdate);
+      }
+      if (collisionUpdate_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CollisionUpdate);
       }
       return size;
     }
@@ -276,11 +841,29 @@ namespace GameDataUDP {
       if (other == null) {
         return;
       }
-      if (other.positionUpdate_ != null) {
-        if (positionUpdate_ == null) {
-          positionUpdate_ = new global::GameDataUDP.PositionUpdate();
+      if (other.keyPress_ != null) {
+        if (keyPress_ == null) {
+          keyPress_ = new global::GameDataUDP.KeyPress();
         }
-        PositionUpdate.MergeFrom(other.PositionUpdate);
+        KeyPress.MergeFrom(other.KeyPress);
+      }
+      if (other.playerPosUpdate_ != null) {
+        if (playerPosUpdate_ == null) {
+          playerPosUpdate_ = new global::GameDataUDP.PlayerPositionUpdate();
+        }
+        PlayerPosUpdate.MergeFrom(other.PlayerPosUpdate);
+      }
+      if (other.bulletPosUpdate_ != null) {
+        if (bulletPosUpdate_ == null) {
+          bulletPosUpdate_ = new global::GameDataUDP.BulletPositionUpdate();
+        }
+        BulletPosUpdate.MergeFrom(other.BulletPosUpdate);
+      }
+      if (other.collisionUpdate_ != null) {
+        if (collisionUpdate_ == null) {
+          collisionUpdate_ = new global::GameDataUDP.CollisionUpdate();
+        }
+        CollisionUpdate.MergeFrom(other.CollisionUpdate);
       }
     }
 
@@ -293,10 +876,31 @@ namespace GameDataUDP {
             input.SkipLastField();
             break;
           case 10: {
-            if (positionUpdate_ == null) {
-              positionUpdate_ = new global::GameDataUDP.PositionUpdate();
+            if (keyPress_ == null) {
+              keyPress_ = new global::GameDataUDP.KeyPress();
             }
-            input.ReadMessage(positionUpdate_);
+            input.ReadMessage(keyPress_);
+            break;
+          }
+          case 18: {
+            if (playerPosUpdate_ == null) {
+              playerPosUpdate_ = new global::GameDataUDP.PlayerPositionUpdate();
+            }
+            input.ReadMessage(playerPosUpdate_);
+            break;
+          }
+          case 26: {
+            if (bulletPosUpdate_ == null) {
+              bulletPosUpdate_ = new global::GameDataUDP.BulletPositionUpdate();
+            }
+            input.ReadMessage(bulletPosUpdate_);
+            break;
+          }
+          case 34: {
+            if (collisionUpdate_ == null) {
+              collisionUpdate_ = new global::GameDataUDP.CollisionUpdate();
+            }
+            input.ReadMessage(collisionUpdate_);
             break;
           }
         }

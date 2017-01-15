@@ -30,11 +30,13 @@ namespace GameServer
         //Private UDP variables
         private static bool udpMessageReceived_ = false;
         private static bool udpMessageSent_ = false;
+        private static Thread handleUDPMsgThread_;
 
         private static IPEndPoint broadcastEP = new IPEndPoint(IPAddress.Broadcast, 8082);
 
         //Queues
-        private static Queue UDPmessageQueue_ = new Queue();
+        private static Queue UDPmessageRecvQueue_ = new Queue();
+        private static Queue UDPmessageSendQueue_ = new Queue();
 
         //Database
         private static SQLiteConnection dbConnection;
@@ -96,6 +98,9 @@ namespace GameServer
                 }
                 //Close the connection after excuting the command
                 dbConnection.Close();
+
+                handleUDPMsgThread_ = new Thread(new ThreadStart(handleUDPRecvMessage));
+                handleUDPMsgThread_.Start();
 
                 //Start the accept loop to handle new connected clients
                 isRunning_ = true;
@@ -392,26 +397,15 @@ namespace GameServer
             byte[] recvBytes = s.socket.EndReceive(ar, ref s.endPoint);
             s.buffer = recvBytes;
 
-            UDPmessageQueue_.Enqueue(recvBytes);
+            //UDPmessageQueue_.Enqueue(recvBytes);
+            addMsgToUDPGueue(recvBytes);
 
-            if (UDPmessageQueue_.Count > 0)
+            byte[] response = getMsgFromUDPSendQueue();
+            if (response.Length > 0)
             {
-                //Using Protobuf, deserialize the recieved bytes/string so we can now use the protobuf generated functions
-                //to access the data (protoData.Register.Username)
-                GameDataUDP.DataMessage protoData = new GameDataUDP.DataMessage();
-                protoData = GameDataUDP.DataMessage.Parser.ParseFrom((byte[])UDPmessageQueue_.Dequeue());
-
-                if (protoData.PositionUpdate != null)
-                {
-                    float a = protoData.PositionUpdate.XPos;
-                    //Console.WriteLine("Recieved UDP: {0}", protoData.PositionUpdate.ToString());
-
-                    //Broadcast the position Update to all players
-                    byte[] messageBuffer = protoData.ToByteArray();
-                    SendUDPMessage(messageBuffer, s.socket, broadcastEP);
-                }
-  
+                SendUDPMessage(response, s.socket, broadcastEP);
             }
+
             // The message needs to be handled
             udpMessageReceived_ = true;
 
@@ -431,9 +425,6 @@ namespace GameServer
             {
                 Thread.Sleep(100);
             }
-
-
-
         }
 
         public static void UDPSendCallBack(IAsyncResult ar)
@@ -450,7 +441,7 @@ namespace GameServer
             try
             {
                 // Send the message
-                client.BeginSend(message, message.Length, endPoint, new AsyncCallback(UDPSendCallBack), client);
+                client.BeginSend(message, message.Length, broadcastEP, new AsyncCallback(UDPSendCallBack), client);
 
                 while (!udpMessageSent_)
                 {
@@ -462,6 +453,93 @@ namespace GameServer
                 Console.WriteLine(e.ToString());
             }
 
+        }
+
+        public static void addMsgToUDPGueue(byte[] msg)
+        {
+            Mutex m = new Mutex();
+            m.WaitOne();
+
+            UDPmessageRecvQueue_.Enqueue(msg);
+
+            m.ReleaseMutex();
+        }
+
+        public static byte[] getUDPMsgFromQueue()
+        {
+            if (UDPmessageRecvQueue_.Count > 0)
+            {
+                Mutex m = new Mutex();
+
+                m.WaitOne();
+
+                byte[] msg = (byte[])UDPmessageRecvQueue_.Peek();
+
+                UDPmessageRecvQueue_.Dequeue();
+
+                m.ReleaseMutex();
+
+                return msg;
+            }
+            byte[] empty = new byte[0];
+            return empty;
+        }
+
+        //Handle the udp messages from stored in the message queue
+        public static void handleUDPRecvMessage()
+        {
+            while (true)
+            {
+                byte[] msg = getUDPMsgFromQueue();
+                if (msg.Length > 0)
+                {
+                    //Using Protobuf, deserialize the recieved bytes / string so we can now use the protobuf generated functions
+                    //to access the data(protoData.Register.Username)
+                    GameDataUDP.DataMessage protoData = new GameDataUDP.DataMessage();
+                    protoData = GameDataUDP.DataMessage.Parser.ParseFrom(msg);
+
+                    if (protoData.PlayerPosUpdate != null)
+                    {
+                        Console.WriteLine("Recieved UDP: {0}", protoData.PlayerPosUpdate.ToString());
+
+                        //Broadcast the position Update to all players
+                        byte[] messageBuffer = protoData.ToByteArray();
+                        //Add to send Queue
+                        addMsgToUDPSendQueue(messageBuffer);
+                    }
+                }
+            }
+        }
+
+        public static void addMsgToUDPSendQueue(byte[] msg)
+        {
+            Mutex m = new Mutex();
+
+            m.WaitOne();
+
+            UDPmessageSendQueue_.Enqueue(msg);
+
+            m.ReleaseMutex();
+        }
+
+        public static byte[] getMsgFromUDPSendQueue()
+        {
+            if (UDPmessageSendQueue_.Count > 0)
+            {
+                Mutex m = new Mutex();
+
+                m.WaitOne();
+
+                byte[] msg = (byte[])UDPmessageSendQueue_.Peek();
+
+                UDPmessageSendQueue_.Dequeue();
+
+                m.ReleaseMutex();
+
+                return msg;
+            }
+            byte[] empty = new byte[0];
+            return empty;
         }
 
     }

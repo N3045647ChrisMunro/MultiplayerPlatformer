@@ -13,6 +13,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <Box2D/Box2D.h>
 #include <vector>
+#include <queue>
+#include <mutex>
 #include "TCPNetwork.hpp"
 #include "Box.h"
 
@@ -44,11 +46,23 @@ private:
 	void recvTCPMessage();
 	void recvUDPMessage();
 
+	void sendUDPMessage();
+
 	void startClient();
 	void unReg();
 	void setupPlatforms();
 
 	void updatePosMessage();
+	std::queue<std::string> udpMsgSendQueue_;
+	std::queue<std::string> udpMsgRecvQueue_;
+
+	std::string getSendMessage();
+	void addMsgToSendQueue(std::string msg);
+
+	std::string getRecvMessage();
+	void addMsgToRecvQueue(std::string msg);
+
+	void spacePressed();
 
 private:
 
@@ -60,6 +74,7 @@ private:
 	//Network Variables
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
+	std::mutex threadMutex_;
 
 	//Game Physics Variables
 	b2World *world_{ nullptr };

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <thread>
 #include <fstream>
+#include <mutex>
 
 //Protobuf
 #include "GameDataTCP.pb.h"
@@ -84,7 +85,9 @@ void GameState::updateWorld()
 {
 	// Create and start the receive thread
 	std::thread tcp_recvThread(&GameState::recvTCPMessage, this);
-	//std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+	std::thread udp_recvThread(&GameState::recvUDPMessage, this);
+
+	std::thread udp_sendThread(&GameState::sendUDPMessage, this);
 
 	sf::Vector2f tempPos = player_->getPosition();
 
@@ -103,13 +106,19 @@ void GameState::updateWorld()
 			{
 				window_->close();
 			}
+			if (event.type == sf::Event::KeyPressed) {
+				if (event.key.code == sf::Keyboard::Space) {
+
+					//Send SpaceKey press Msg to server
+				}
+			}
 		}
 
-		if (player_->getPosition() != tempPos) {
-			updatePosMessage();
+		//if (player_->getPosition() != tempPos) {
+		//	updatePosMessage();
 
-			tempPos = player_->getPosition();
-		}
+		//	tempPos = player_->getPosition();
+		//}
 
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
@@ -120,6 +129,7 @@ void GameState::updateWorld()
 
 		if (enemies_.size() > 0) {
 			for (auto e : enemies_) {
+				std::cout << "EPos: " << e->getPosition().x << ", " << e->getPosition().y << std::endl;
 				if (e->isAlive()) {
 					window_->draw(*e);
 					e->update(deltaTime.asSeconds());
@@ -136,7 +146,9 @@ void GameState::updateWorld()
 
 	//When the game window closes, join the threads back to the "main" thread
 	tcp_recvThread.join();
-	//udp_recvThread.join();
+	udp_recvThread.join();
+
+	udp_sendThread.join();
 }
 
 //Clean and "free up" Memory
@@ -222,8 +234,8 @@ void GameState::recvUDPMessage()
 
 			dataMsg = udpNetwork_.receiveData();
 
-			if (dataMsg->has_positionupdate()) {
-				std::cout << dataMsg->positionupdate().xpos() << ", " << dataMsg->positionupdate().ypos() << std::endl;
+			if (dataMsg->has_playerposupdate()) {
+				std::cout << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
 			}
 			else {
 				std::cout << "UDP Proto: pos update is null" << std::endl;
@@ -232,6 +244,17 @@ void GameState::recvUDPMessage()
 		else
 			std::cerr << "Error: Connection Lost (UDP)" << std::endl;
 
+	}
+}
+
+void GameState::sendUDPMessage()
+{
+	while (true) {
+		std::string messageToSend = getSendMessage();
+
+		if (messageToSend.size() > 0) {
+			udpNetwork_.sendData(messageToSend);
+		}
 	}
 }
 
@@ -305,9 +328,7 @@ void GameState::startClient()
 
 							std::cout << enemies_[i - 1]->getUserName() << std::endl;
 						}
-
 					}
-
 				}
 			}
 			else if (status == "Failed") {
@@ -402,17 +423,65 @@ void GameState::setupPlatforms()
 void GameState::updatePosMessage()
 {
 	GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
-	GameDataUDP::PositionUpdate* posData = new GameDataUDP::PositionUpdate();
+	GameDataUDP::PlayerPositionUpdate* posData = new GameDataUDP::PlayerPositionUpdate();
 
 	posData->set_xpos(player_->getPosition().x);
 	posData->set_ypos(player_->getPosition().y);
-	dataMsg->set_allocated_positionupdate(posData);
+	dataMsg->set_allocated_playerposupdate(posData);
 
 	std::string stringBuff = dataMsg->SerializeAsString();
 
-	udpNetwork_.sendData(stringBuff);
+	addMsgToSendQueue(stringBuff);
 
+	//udpNetwork_.sendData(stringBuff);
+}
 
+std::string GameState::getSendMessage()
+{
+	if (udpMsgSendQueue_.size() > 0) {
+		threadMutex_.lock();
 
+		std::string message;
+		message = udpMsgSendQueue_.front();
+		udpMsgSendQueue_.pop();
+
+		threadMutex_.unlock();
+
+		return message;
+	}
+	return "";
+}
+
+void GameState::addMsgToSendQueue(std::string msg)
+{
+	threadMutex_.lock();
+
+	udpMsgSendQueue_.push(msg);
+
+	threadMutex_.unlock();
+}
+
+std::string GameState::getRecvMessage()
+{
+	return std::string();
+}
+
+void GameState::addMsgToRecvQueue(std::string msg)
+{
+}
+
+void GameState::spacePressed()
+{
+	GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
+
+	GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
+
+	keyMsg->set_key = "Space";
+
+	dataMsg->set_allocated_keypress(keyMsg);
+
+	std::string stringBuff = dataMsg->SerializeAsString();
+
+	addMsgToSendQueue(stringBuff);
 }
 

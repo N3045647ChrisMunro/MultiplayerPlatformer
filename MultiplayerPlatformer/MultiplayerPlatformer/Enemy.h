@@ -24,6 +24,11 @@ public:
 	void setUserName(std::string username);
 	std::string getUserName() const { return username_; }
 
+	void setEnemyPos(sf::Vector2f pos);
+	void setEnemyVelocity(sf::Vector2f vel);
+
+	sf::Vector2f getPosition() const { return enemyPos_; }
+
 private:
 
 	bool isAlive_{ false };
@@ -33,7 +38,8 @@ private:
 	sf::Texture eTexture_;
 	sf::RectangleShape colBox_;
 
-	sf::Vector2f enemyPos_{ 0, 0 };
+	sf::Vector2f enemyPos_{ -150, -150 };
+	sf::Vector2f enemyVelocity_{ 0, 0 };
 
 	std::string username_{ "" };
 };
