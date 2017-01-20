@@ -82,18 +82,26 @@ void TCPNetwork::createSocket()
 #endif //  __APPLE__
 }
 
-void TCPNetwork::connectToServer()
+bool TCPNetwork::connectToServer()
 {
 #ifdef  __APPLE__
+    serv_addr_.sin_addr.s_addr = inet_addr(ip_.c_str());
     serv_addr_.sin_family = AF_INET;
-    serv_addr_.sin_port = htons(port);
+    serv_addr_.sin_port = htons(myPort_);
     
-    if(inet_pton(AF_INET, ip_.c_str(), &serv_addr_.sin_addr) <= 0)
+    
+    if(inet_pton(AF_INET, ip_.c_str(), &serv_addr_.sin_addr) <= 0){
         std::cerr << "Error: inet_pton Error Occured" << std::endl;
+        return false;
+    }
     
-    if(connect(sockfd_, (struct sockaddr*)&serv_addr_, sizeof(serv_addr_)) < 0)
+    if(connect(sockfd_, (struct sockaddr*)&serv_addr_, sizeof(serv_addr_)) < 0){
         std::cerr << "Error: Failed to Connect" << std::endl;
+        return false;
+    }
 
+    return true;
+    
 #elif _WIN32
 
 	sockfd_ = getaddrinfo(ip_.c_str(), port_.c_str(), &hints_, &local_);
@@ -131,7 +139,10 @@ void TCPNetwork::connectToServer()
 	if (ConnectSocket_ == INVALID_SOCKET) {
 		std::cerr << "Error: Unable to connect to server!" << std::endl;
 		WSACleanup();
+        return false;
 	}
+    
+    return true;
 
 #endif //  __APPLE__    
 }
@@ -139,7 +150,7 @@ void TCPNetwork::connectToServer()
 void TCPNetwork::sendData(std::string message)
 {
 #ifdef  __APPLE__
-    ssize_t n = send(sockfd_, message.c_str(), sizeof(message.c_str()), 0);
+    ssize_t n = send(sockfd_, message.data(), strlen(message.c_str()), 0);
     
     if(n < 0)
         std::cerr << "Error: Failed to Send" << std::endl;
@@ -155,55 +166,6 @@ void TCPNetwork::sendData(std::string message)
 #endif //  __APPLE__ 
 }
 
-void TCPNetwork::sendFile(std::string filename)
-{
-#ifdef  __APPLE__
-	ssize_t n = send(sockfd_, message.c_str(), sizeof(message.c_str()), 0);
-
-	if (n < 0)
-		std::cerr << "Error: Failed to Send" << std::endl;
-
-#elif _WIN32
-
-	//Get the file size
-	std::fstream fileToSend(filename, std::ios::in | std::ios::binary);
-	if (!fileToSend)
-		std::cerr << "Error: TCP Failed to open file: " << filename << std::endl;
-	fileToSend.seekg(0, std::ios::end);
-	unsigned int fileSize = fileToSend.tellg();
-	fileToSend.close();
-
-	//Get the File
-	char *buffer = new char[fileSize];
-	//memset(buffer, 0, sizeof(buffer));
-	fileToSend.open(filename, std::ios::binary);
-	fileToSend.seekg(0, std::ios::beg);
-	fileToSend.read(buffer, fileSize);
-	fileToSend.close();
-
-	//Send file in Chunks
-	const int FILE_CHUNK_SIZE = 2000;
-	unsigned int bytesSent = 0;
-	int bytesToSend = 0;
-
-	while (bytesSent < fileSize) {
-	
-		if (fileSize - bytesSent >= FILE_CHUNK_SIZE)
-			bytesToSend = FILE_CHUNK_SIZE;
-		else
-			bytesToSend = fileSize - bytesSent;
-
-		send(ConnectSocket_, buffer + bytesSent, bytesToSend, 0);
-		bytesSent += bytesToSend;
-
-	}
-	
-	std::cout << "Sent File: " << buffer << std::endl;
-	
-	delete[] buffer;
-#endif //  __APPLE__ 
-}
-
 void TCPNetwork::setIP_address(std::string ip)
 {
 	ip_ = ip;
@@ -212,6 +174,11 @@ void TCPNetwork::setIP_address(std::string ip)
 void TCPNetwork::setPortNumber(std::string port)
 {
 	port_ = port;
+}
+
+void TCPNetwork::setPortNumber(int port)
+{
+    myPort_ = port;
 }
 
 bool TCPNetwork::isConnected() const
@@ -238,14 +205,30 @@ GameDataTCP::DataMessage* TCPNetwork::receiveData()
 
 #ifdef  __APPLE__
 
-    long n = recv(sockfd_, recvBuff_, sizeof(recvBuff_), 0);
+    GameDataTCP::DataMessage *dataMsg = new GameDataTCP::DataMessage();
+    dataMsg->Clear();
+    
+    memset(recvBuff_, 0, sizeof(recvBuff_));
+    int n = (int)recv(sockfd_, recvBuff_, sizeof(recvBuff_), 0);
     
     if(n < 0)
         std::cerr << "Error: Read Error" << std::endl;
     else{
-        std::cout << "Recieved: " << n << " BYTES" << std::endl;
-        std::cout << "Recieved: " << recvBuff_ << std::endl;
+        //For macs i need to add 1 to the array size for,,, unknown reasons
+        char *newBuffer = new char[n + 1];
+        
+        memcpy(newBuffer, recvBuff_, n + 1);
+        
+        if(dataMsg->ParseFromArray(newBuffer, n + 1)){
+            std::cerr << "Error: Parse Failed (TCP)" << std::endl;
+            return nullptr;
+        }
+        
+        return dataMsg;
+        
     }
+    
+    return dataMsg;
 
 #elif _WIN32 
 

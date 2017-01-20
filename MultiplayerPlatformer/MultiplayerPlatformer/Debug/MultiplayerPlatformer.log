@@ -1,3 +1,37 @@
-﻿  Enemy.cpp
+﻿  UDPNetwork.cpp
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\stubs\logging.h(100): warning C4251: 'google::protobuf::internal::LogMessage::message_': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'google::protobuf::internal::LogMessage'
+  c:\program files (x86)\microsoft visual studio 14.0\vc\include\xstring(2633): note: see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\arena.h(555): warning C4251: 'google::protobuf::Arena::lifecycle_id_generator_': class 'google::protobuf::internal::SequenceNumber' needs to have dll-interface to be used by clients of class 'google::protobuf::Arena'
+  d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\stubs\atomic_sequence_num.h(39): note: see declaration of 'google::protobuf::internal::SequenceNumber'
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\arena.h(914): warning C4251: 'google::protobuf::Arena::options_': struct 'google::protobuf::ArenaOptions' needs to have dll-interface to be used by clients of class 'google::protobuf::Arena'
+  d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\arena.h(88): note: see declaration of 'google::protobuf::ArenaOptions'
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\descriptor.h(1626): warning C4251: 'google::protobuf::DescriptorPool::tables_': class 'google::protobuf::internal::scoped_ptr<google::protobuf::DescriptorPool::Tables>' needs to have dll-interface to be used by clients of class 'google::protobuf::DescriptorPool'
+  d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\descriptor.h(1626): note: see declaration of 'google::protobuf::internal::scoped_ptr<google::protobuf::DescriptorPool::Tables>'
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\descriptor.h(1631): warning C4251: 'google::protobuf::DescriptorPool::unused_import_track_files_': class 'std::set<std::string,std::less<_Kty>,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'google::protobuf::DescriptorPool'
+          with
+          [
+              _Kty=std::string,
+              _Ty=std::string
+          ]
+  d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\descriptor.h(1631): note: see declaration of 'std::set<std::string,std::less<_Kty>,std::allocator<_Ty>>'
+          with
+          [
+              _Kty=std::string,
+              _Ty=std::string
+          ]
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\extension_set.h(632): warning C4251: 'google::protobuf::internal::ExtensionSet::extensions_': class 'std::map<int,google::protobuf::internal::ExtensionSet::Extension,std::less<int>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'google::protobuf::internal::ExtensionSet'
+          with
+          [
+              _Kty=int,
+              _Ty=google::protobuf::internal::ExtensionSet::Extension
+          ]
+  d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\dependencies\protobuf\include\google\protobuf\extension_set.h(561): note: see declaration of 'std::map<int,google::protobuf::internal::ExtensionSet::Extension,std::less<int>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=int,
+              _Ty=google::protobuf::internal::ExtensionSet::Extension
+          ]
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\udpnetwork.cpp(146): warning C4101: 'from': unreferenced local variable
+d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\udpnetwork.cpp(175): warning C4715: 'UDPNetwork::receiveData': not all control paths return a value
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.exe
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Debug\MultiplayerPlatformer.pdb (Partial PDB)

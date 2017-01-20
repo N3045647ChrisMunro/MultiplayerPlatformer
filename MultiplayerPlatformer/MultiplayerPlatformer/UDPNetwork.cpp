@@ -3,7 +3,7 @@
 //  PlatformerGame
 //
 //  Created by MUNRO, CHRISTOPHER on 02/12/2016.
-//  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
+//  Copyright ï¿½ 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -54,14 +54,20 @@ void UDPNetwork::createSocket()
 
 	//Setup address structure
 	ser_addr_.sin_family = AF_INET;
-	ser_addr_.sin_port = htons(port_);
+	ser_addr_.sin_port = htons(8082);
+    ser_addr_.sin_addr.s_addr = INADDR_ANY;
 
 	socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    
+    const int broadPermission = 1;
+    setsockopt(socket_, SOL_SOCKET, SO_BROADCAST, (void *) broadPermission, sizeof(broadPermission));
 
 	const int trueValue = 1;
 	setsockopt(socket_, SOL_SOCKET, SO_REUSEPORT, &trueValue, sizeof(trueValue));
-
-	if (socket_ < 0)
+    
+    int result = bind(socket_, (sockaddr *)&ser_addr_, sizeof(ser_addr_));
+    
+	if (result < 0)
 		std::cerr << "Error: Failed to Create Socket" << std::endl;
 
 	//if(bind(socket_, (struct sockaddr *)&ser_addr_, sizeof(ser_addr_) ) < 0)
@@ -104,28 +110,42 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 {
 #ifdef __APPLE__
 
-	std::cout << "Listening for UDP data...." << std::endl;
+	//std::cout << "Listening for UDP data...." << std::endl;
 
-	int s = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
-	//int s = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &ser_addr_, (unsigned int *)(&ser_addr_));
+    GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+    
+	//int s = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
+    socklen_t size = sizeof(ser_addr_);
+	int s = (int)recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (struct sockaddr *) &ser_addr_, &size);
 
 	if (s < 0) {
 		std::cerr << "Error: UDP Read Error" << s << std::endl;
 	}
 	else {
-		std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
-		std::cout << "Received UDP: " << recvBuff_ << std::endl;
+        //std::cout << "UDP Recv: " << s << "Bytes" << std::endl;
+        char *newBuffer = new char[s + 1];
+        
+        memcpy(newBuffer, recvBuff_, s + 1);
+
+        if(dataMsg->ParseFromArray(newBuffer, s + 1)){
+            std::cerr << "Error: Parse Failed (UDP)" << std::endl;
+            return nullptr;
+        }else{
+            return dataMsg;
+            //std::cout << dataMsg->playerposupdate().username() << ", " << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
+        }
 	}
+    return dataMsg;
 
 #elif _WIN32
 	if (socket_ > 0) {
+		std::cout << "Listeng for udp data..." << std::endl;
+
 		GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
 
 		sockaddr_in *from;
 		int size = sizeof(recvAddr_);
 		int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (sockaddr *)&recvAddr_, &size);
-
-		//int result = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
 
 		if (result > 0) {
 			char *newBuffer = new char[result];
@@ -133,7 +153,7 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 			memcpy(newBuffer, recvBuff_, result);
 
 			if (!dataMsg->ParseFromArray(newBuffer, result)) {
-				std::cout << "Error: Parse Failed" << std::endl;
+				std::cout << "Error: Parse Failed (UDP)" << std::endl;
 				return nullptr;
 			}
 		}
@@ -143,6 +163,7 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 		else {
 			//std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
 			//std::cout << "Received UDP: " << newBuffer << std::endl;
+			udpMessenger_->addMsgToRecvQueue(dataMsg);
 			return dataMsg;
 		}
 	}
@@ -155,21 +176,22 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 
 void UDPNetwork::sendData(std::string message)
 {
-	char buffer[1024];
-	memset(buffer, 0, 1024);
-	memcpy(buffer, message.c_str(), message.length());
 
 #ifdef __APPLE__
+    //int addrSize = (int)sizeof(ser_addr_);
+    
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port_);
+    addr.sin_addr.s_addr = inet_addr(ip_.c_str());
+    
+	ssize_t s = sendto(socket_, message.data(), message.size(), 0, (struct sockaddr *)&addr, sizeof(addr));
 
-	int s = sendto(socket_, buffer, sizeof(buffer), 0, (struct sockaddr *)&ser_addr_, sizeof(ser_addr_));
-
-	std::cout << "UDP SOCKET " << s << std::endl;
-
-	if (s > 0)
-		std::cout << "Sent UDP " << std::endl;
-	else
+	if (s < 0)
 		std::cerr << "Error: UDP Send failed: " << s << std::endl;
-
+    //else
+        //std::cout << "Sent: " << message << std::endl;
+    
 
 #elif _WIN32
 
@@ -202,7 +224,7 @@ bool UDPNetwork::isConnected() const
 {
 #ifdef __APPLE__
 
-	if (sockfd_ > 0) {
+	if (socket_ > 0) {
 		return true;
 	}
 	return false;
@@ -215,4 +237,9 @@ bool UDPNetwork::isConnected() const
 	return false;
 
 #endif
+}
+
+void UDPNetwork::setUDPMessenger(UDPMessenger * messenger)
+{
+	udpMessenger_ = messenger;
 }

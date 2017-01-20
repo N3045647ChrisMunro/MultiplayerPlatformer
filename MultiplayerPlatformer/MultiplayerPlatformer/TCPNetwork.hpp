@@ -35,13 +35,14 @@ public:
     ~TCPNetwork();
     
     void createSocket();
-    void connectToServer();
+    bool connectToServer();
 	GameDataTCP::DataMessage* receiveData();
     void sendData(std::string message);
-	void sendFile(std::string filename);
     
 	void setIP_address(std::string ip);
 	void setPortNumber(std::string port);
+    void setPortNumber(int port);
+
 
 	bool isConnected() const;
     
@@ -57,6 +58,7 @@ private:
 #ifdef __APPLE__
 
     struct sockaddr_in serv_addr_;
+    int myPort_;
 
 #elif _WIN32
 
@@ -65,6 +67,7 @@ private:
 					hints_;
 
 	SOCKET ConnectSocket_ = INVALID_SOCKET;
+	int myPort_;
 
 #endif
     

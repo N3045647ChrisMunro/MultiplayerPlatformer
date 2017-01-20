@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include "GameDataUDP.pb.h"
+#include "UDPMessenger.h"
 
 class UDPNetwork
 {
@@ -46,8 +47,11 @@ public:
 	void setPortNumber(int port);
 
 	bool isConnected() const;
+	void setUDPMessenger(UDPMessenger *messenger);
 
 private:
+
+	UDPMessenger *udpMessenger_{nullptr};
 
 	std::string ip_;
 	int port_;

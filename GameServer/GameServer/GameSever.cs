@@ -523,12 +523,24 @@ namespace GameServer
                     //Check for Velocity Updates
                     if (protoData.PlayerPosUpdate != null)
                     {
-                        Console.WriteLine("Recieved UDP: {0}", protoData.PlayerPosUpdate.ToString());
+                        GameDataUDP.PlayerPositionUpdate responsePosData = new GameDataUDP.PlayerPositionUpdate();
 
-                        GameDataUDP.DataMessage responseData = new GameDataUDP.DataMessage();
+                        float xPos = protoData.PlayerPosUpdate.XPos;
+                        float yPos = protoData.PlayerPosUpdate.YPos;
+                        string username = protoData.PlayerPosUpdate.Username;
+
+                        responsePosData.XPos = xPos;
+                        responsePosData.YPos = yPos;
+                        responsePosData.Username = username;
+
+                        GameDataUDP.DataMessage data = new GameDataUDP.DataMessage();
+
+                        data.PlayerPosUpdate = responsePosData;
+
+                        Console.WriteLine("Recieved UDP: {0}", data.PlayerPosUpdate.ToString());
 
                         //Broadcast the position Update to all players
-                        byte[] messageBuffer = protoData.ToByteArray();
+                        byte[] messageBuffer = data.ToByteArray();
                         //Add to send Queue
                         addMsgToUDPSendQueue(messageBuffer);
                     }

@@ -3,7 +3,7 @@
 //  Multiplayer Platformer
 //
 //  Created by MUNRO, CHRISTOPHER on 11/11/2016.
-//  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
+//  Copyright ï¿½ 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
 #include "GameState.h"
@@ -15,6 +15,10 @@
 //Protobuf
 #include "GameDataTCP.pb.h"
 #include "GameDataUDP.pb.h"
+#include "google/protobuf/compiler/parser.h"
+
+//NetWork
+#include "UDPMessenger.h"
 
 //Include Game Classes
 #include "Player.h"
@@ -22,8 +26,6 @@
 #include "Bullet.h"
 #include "Box.h"
 #include "Platform.h"
-
-#include "google/protobuf/compiler/parser.h"
 
 #define PPM 30.f //Pixels per meter
 
@@ -57,7 +59,11 @@ bool GameState::createWorld()
 			enemies_[i]->createSprite(world_);
 		}
 
-		udpNetwork_.setIP_address("192.168.170.1");
+
+		udpMessenger_ = new UDPMessenger();
+
+		udpNetwork_.setUDPMessenger(udpMessenger_);
+		udpNetwork_.setIP_address("25.74.8.120");
 		udpNetwork_.setPortNumber(8081);
 		udpNetwork_.createSocket();
 
@@ -65,7 +71,7 @@ bool GameState::createWorld()
 
 		//Create game Window
 		windowDimensions_ = sf::VideoMode::getFullscreenModes();
-		window_ = new sf::RenderWindow(windowDimensions_[0], "SFML Test");
+		window_ = new sf::RenderWindow(windowDimensions_[10], "SFML Test");
 
 
 		//Create all the platfroms for the game world
@@ -189,7 +195,6 @@ void GameState::recvTCPMessage()
 		if (tcpNetwork_->isConnected()) {
 
 			GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
-			GameDataTCP::NewPlayerReg* reg = new GameDataTCP::NewPlayerReg();
 			dataMsg->Clear();
 
 			dataMsg = tcpNetwork_->receiveData();
@@ -202,14 +207,15 @@ void GameState::recvTCPMessage()
 					for (unsigned int i = 0; i < dataMsg->newplayerreg_size(); i++) {
 
 						std::string status = dataMsg->newplayerreg().Get(i).status();
+                        //std::string status = dataMsg->newplayerreg(0).status();
 
 						if (status == "NewReg") {
 							std::cout << "New Player Registered" << std::endl;
 
 							enemies_[enemiesIDXTracker_]->setAliveStatus(true);
-							enemies_[enemiesIDXTracker_]->setUserName(dataMsg->newplayerreg().Get(0).username());
+							enemies_[enemiesIDXTracker_]->setUserName(dataMsg->newplayerreg().Get(i).username());
 							enemiesIDXTracker_++;
-
+                            enemyActiveCount_++;
 							dataMsg->Clear();
 						}
 					}
@@ -231,17 +237,11 @@ void GameState::recvUDPMessage()
 	while (true)
 	{
 		if (udpNetwork_.isConnected()) {
-			GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
+            //GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
 
-			dataMsg = udpNetwork_.receiveData();
-			addMsgToRecvQueue(*dataMsg);
+			//dataMsg = udpNetwork_.receiveData();
+			//addMsgToRecvQueue(dataMsg);
 
-			//if (dataMsg->has_playerposupdate()) {
-			//	std::cout << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
-			//}
-			//if (dataMsg->has_playervelocityupdate()) {
-			//	std::cout << dataMsg->playervelocityupdate().xpos() << ", " << dataMsg->playervelocityupdate().ypos() << std::endl;
-			//}
 		}
 		else
 			std::cerr << "Error: Connection Lost (UDP)" << std::endl;
@@ -252,7 +252,7 @@ void GameState::recvUDPMessage()
 void GameState::sendUDPMessage()
 {
 	while (true) {
-		std::string messageToSend = getSendMessage();
+		std::string messageToSend = udpMessenger_->getSendMessage();
 
 		if (messageToSend.size() > 0) {
 			udpNetwork_.sendData(messageToSend);
@@ -267,7 +267,7 @@ void GameState::handleUDPMessage()
 
 		std::string playerUserName = player_->getUsername();
 
-		dataMsg = getRecvMessage();
+		dataMsg = udpMessenger_->getRecvMessage();
 		if (dataMsg != nullptr) {
 
 			//check if the message is a POSITION UPDDATE
@@ -275,24 +275,23 @@ void GameState::handleUDPMessage()
 			if (dataMsg->has_playerposupdate()) {
 
 				std::string who = dataMsg->playerposupdate().username();
+                
 				if (dataMsg->playerposupdate().username() != playerUserName) {
-					std::cout << who << ", " << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
 
 					if (enemyActiveCount_ > 0) {
 
 						for (auto e : enemies_) {
 							if (e->isAlive() && e->getUserName() == who) {
-								std::cout << "update " << who << " pos" << std::endl;
+                                const float x = dataMsg->playerposupdate().xpos();
+                                const float y = dataMsg->playerposupdate().ypos();
+                                e->setEnemyPos(sf::Vector2f(x, y));
+                                break;
 							}
 						}
 
 					}
 
 				}
-				else {
-					//std::cout << "You moved" << std::endl;
-				}
-
 				
 			}
 			if (dataMsg->has_playervelocityupdate()) {
@@ -307,8 +306,20 @@ void GameState::startClient()
 {
 	//Set up the network connection to the server
 	tcpNetwork_ = new TCPNetwork();
-	tcpNetwork_->setIP_address(std::string("192.168.170.1"));
+    
+    std::cout << "Please Enter Server IP Address" << std::endl;
+    std::cout << ">>: ";
+    std::string ipIn;
+    std::cin >> ipIn;
+    
+	tcpNetwork_->setIP_address(std::string(ipIn));
+    
+    #ifdef  __APPLE__
+    tcpNetwork_->setPortNumber(8080);
+    #elif _WIN32
 	tcpNetwork_->setPortNumber(std::string("8080"));
+    #endif
+    
 	tcpNetwork_->createSocket();
 	tcpNetwork_->connectToServer();
 
@@ -370,10 +381,8 @@ void GameState::startClient()
 						if (status == "oldClients") {
 							enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
 							enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
-							enemies_[i - 1]->setEnemyPos(sf::Vector2f(300, 200));
+							//enemies_[i - 1]->setEnemyPos(sf::Vector2f(300, 200));
 							enemyActiveCount_++;
-
-							std::cout << enemies_[i - 1]->getUserName() << std::endl;
 						}
 					}
 				}
@@ -472,7 +481,7 @@ void GameState::updatePosMessage()
 
 	std::string stringBuff = dataMsg->SerializeAsString();
 
-	addMsgToSendQueue(stringBuff);
+	udpMessenger_->addMsgToSendQueue(stringBuff);
 
 	//udpNetwork_.sendData(stringBuff);
 }
@@ -484,8 +493,7 @@ std::string GameState::getSendMessage()
 
 		std::string message;
 		message = udpMsgSendQueue_.front();
-		udpMsgSendQueue_.pop();
-
+		udpMsgSendQueue_.pop();        
 		threadMutex_.unlock();
 
 		return message;
@@ -497,8 +505,8 @@ void GameState::addMsgToSendQueue(std::string msg)
    {
 	threadMutex_.lock();
 
-	udpMsgSendQueue_.push(msg);
-
+	udpMsgSendQueue_.push(msg);       
+       
 	threadMutex_.unlock();
 }
 
@@ -518,11 +526,11 @@ GameDataUDP::DataMessage* GameState::getRecvMessage()
 	return nullptr;
 }
 
-void GameState::addMsgToRecvQueue(GameDataUDP::DataMessage &dataMsg)
+void GameState::addMsgToRecvQueue(GameDataUDP::DataMessage *dataMsg)
 {
-	threadMutex_.lock();
-
-	udpMsgRecvQueue_.push(&dataMsg);
+    threadMutex_.lock();
+    
+	udpMsgRecvQueue_.push(dataMsg);
 
 	threadMutex_.unlock();
 }

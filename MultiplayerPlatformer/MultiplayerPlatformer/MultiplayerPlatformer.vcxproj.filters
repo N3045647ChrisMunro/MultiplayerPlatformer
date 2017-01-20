@@ -54,6 +54,9 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UDPMessenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h">
@@ -77,9 +80,6 @@
     <ClInclude Include="UDPNetwork.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
-    <ClInclude Include="Messager.h">
-      <Filter>Header Files\Network</Filter>
-    </ClInclude>
     <ClInclude Include="GameDataTCP.pb.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
@@ -87,6 +87,12 @@
       <Filter>Header Files\Network</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Messenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPMessenger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

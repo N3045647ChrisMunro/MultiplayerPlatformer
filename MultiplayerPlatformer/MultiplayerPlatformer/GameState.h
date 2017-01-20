@@ -3,7 +3,7 @@
 //  Multiplayer Platformer
 //
 //  Created by MUNRO, CHRISTOPHER on 11/11/2016.
-//  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
+//  Copyright ï¿½ 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
 #pragma once
@@ -21,13 +21,13 @@
 //Include Network classes
 #include "TCPNetwork.hpp"
 #include "UDPNetwork.h"
-#include "Messager.h"
-
 
 //Forward Declaration of Game Classes
 class Player;
 class Enemy;
 class Platform;
+
+class UDPMessenger;
 
 class GameState
 {
@@ -61,7 +61,7 @@ private:
 	void addMsgToSendQueue(std::string msg);
 
 	GameDataUDP::DataMessage* getRecvMessage();
-	void addMsgToRecvQueue(GameDataUDP::DataMessage &dataMsg);
+	void addMsgToRecvQueue(GameDataUDP::DataMessage *dataMsg);
 
 	void spacePressed();
 
@@ -75,7 +75,10 @@ private:
 	//Network Variables
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
-	std::mutex threadMutex_;
+	UDPMessenger *udpMessenger_{ nullptr };
+    
+    std::mutex threadMutex_;
+
 
 	//Game Physics Variables
 	b2World *world_{ nullptr };
