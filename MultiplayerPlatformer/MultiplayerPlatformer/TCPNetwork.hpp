@@ -48,6 +48,8 @@ public:
     
 private:
     
+    GameDataTCP::DataMessage *dataMsg_{ nullptr };
+    
     int sockfd_ = 0;
     
     char recvBuff_[1024];

@@ -13,6 +13,8 @@
 TCPNetwork::TCPNetwork()
 {
 
+    dataMsg_ = new GameDataTCP::DataMessage();
+    
 #ifdef __APPLE__
 
     memset(&serv_addr_, '0', sizeof(serv_addr_));
@@ -202,11 +204,9 @@ bool TCPNetwork::isConnected() const
 
 GameDataTCP::DataMessage* TCPNetwork::receiveData()
 {
-
+    
 #ifdef  __APPLE__
-
     GameDataTCP::DataMessage *dataMsg = new GameDataTCP::DataMessage();
-    dataMsg->Clear();
     
     memset(recvBuff_, 0, sizeof(recvBuff_));
     int n = (int)recv(sockfd_, recvBuff_, sizeof(recvBuff_), 0);
@@ -221,10 +221,13 @@ GameDataTCP::DataMessage* TCPNetwork::receiveData()
         
         if(dataMsg->ParseFromArray(newBuffer, n + 1)){
             std::cerr << "Error: Parse Failed (TCP)" << std::endl;
+            delete[] newBuffer;
             return nullptr;
         }
         
+        delete[] newBuffer;
         return dataMsg;
+        
         
     }
     

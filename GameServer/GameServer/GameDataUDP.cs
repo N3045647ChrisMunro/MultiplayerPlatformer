@@ -22,25 +22,25 @@ namespace GameDataUDP {
     static GameDataUDPReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFHYW1lRGF0YVVEUC5wcm90bxILR2FtZURhdGFVRFAiKQoIS2V5UHJlc3MS",
-            "EAoIdXNlcm5hbWUYASABKAkSCwoDa2V5GAIgASgJIkQKFFBsYXllclBvc2l0",
-            "aW9uVXBkYXRlEhAKCHVzZXJuYW1lGAEgASgJEgwKBHhQb3MYAiABKAISDAoE",
-            "eVBvcxgDIAEoAiJDChNQbGF5ZXJWZWxjaXR5VXBkYXRlEhAKCHVzZXJuYW1l",
-            "GAEgASgJEgwKBHhQb3MYAiABKAISDAoEeVBvcxgDIAEoAiJBChRCdWxsZXRQ",
-            "b3NpdGlvblVwZGF0ZRINCgVvd25lchgBIAEoCRIMCgR4UG9zGAIgASgCEgwK",
-            "BHlQb3MYAyABKAIiNAoPQ29sbGlzaW9uVXBkYXRlEhEKCXBsYXllckhpdBgB",
-            "IAEoCRIOCgZvYmplY3QYAiABKAkipQIKC0RhdGFNZXNzYWdlEicKCGtleVBy",
-            "ZXNzGAEgASgLMhUuR2FtZURhdGFVRFAuS2V5UHJlc3MSOgoPcGxheWVyUG9z",
-            "VXBkYXRlGAIgASgLMiEuR2FtZURhdGFVRFAuUGxheWVyUG9zaXRpb25VcGRh",
-            "dGUSPgoUcGxheWVyVmVsb2NpdHlVcGRhdGUYAyABKAsyIC5HYW1lRGF0YVVE",
-            "UC5QbGF5ZXJWZWxjaXR5VXBkYXRlEjoKD2J1bGxldFBvc1VwZGF0ZRgEIAEo",
-            "CzIhLkdhbWVEYXRhVURQLkJ1bGxldFBvc2l0aW9uVXBkYXRlEjUKD2NvbGxp",
-            "c2lvblVwZGF0ZRgFIAEoCzIcLkdhbWVEYXRhVURQLkNvbGxpc2lvblVwZGF0",
-            "ZWIGcHJvdG8z"));
+            "ChFHYW1lRGF0YVVEUC5wcm90bxILR2FtZURhdGFVRFAiOQoIS2V5UHJlc3MS",
+            "EAoIdXNlcm5hbWUYASABKAkSCwoDa2V5GAIgASgJEg4KBnN0YXR1cxgDIAEo",
+            "CSJEChRQbGF5ZXJQb3NpdGlvblVwZGF0ZRIQCgh1c2VybmFtZRgBIAEoCRIM",
+            "CgR4UG9zGAIgASgCEgwKBHlQb3MYAyABKAIiQwoTUGxheWVyVmVsY2l0eVVw",
+            "ZGF0ZRIQCgh1c2VybmFtZRgBIAEoCRIMCgR4UG9zGAIgASgCEgwKBHlQb3MY",
+            "AyABKAIiQQoUQnVsbGV0UG9zaXRpb25VcGRhdGUSDQoFb3duZXIYASABKAkS",
+            "DAoEeFBvcxgCIAEoAhIMCgR5UG9zGAMgASgCIjQKD0NvbGxpc2lvblVwZGF0",
+            "ZRIRCglwbGF5ZXJIaXQYASABKAkSDgoGb2JqZWN0GAIgASgJIqUCCgtEYXRh",
+            "TWVzc2FnZRInCghrZXlQcmVzcxgBIAEoCzIVLkdhbWVEYXRhVURQLktleVBy",
+            "ZXNzEjoKD3BsYXllclBvc1VwZGF0ZRgCIAEoCzIhLkdhbWVEYXRhVURQLlBs",
+            "YXllclBvc2l0aW9uVXBkYXRlEj4KFHBsYXllclZlbG9jaXR5VXBkYXRlGAMg",
+            "ASgLMiAuR2FtZURhdGFVRFAuUGxheWVyVmVsY2l0eVVwZGF0ZRI6Cg9idWxs",
+            "ZXRQb3NVcGRhdGUYBCABKAsyIS5HYW1lRGF0YVVEUC5CdWxsZXRQb3NpdGlv",
+            "blVwZGF0ZRI1Cg9jb2xsaXNpb25VcGRhdGUYBSABKAsyHC5HYW1lRGF0YVVE",
+            "UC5Db2xsaXNpb25VcGRhdGViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.KeyPress), global::GameDataUDP.KeyPress.Parser, new[]{ "Username", "Key" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.KeyPress), global::GameDataUDP.KeyPress.Parser, new[]{ "Username", "Key", "Status" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.PlayerPositionUpdate), global::GameDataUDP.PlayerPositionUpdate.Parser, new[]{ "Username", "XPos", "YPos" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.PlayerVelcityUpdate), global::GameDataUDP.PlayerVelcityUpdate.Parser, new[]{ "Username", "XPos", "YPos" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameDataUDP.BulletPositionUpdate), global::GameDataUDP.BulletPositionUpdate.Parser, new[]{ "Owner", "XPos", "YPos" }, null, null, null),
@@ -78,6 +78,7 @@ namespace GameDataUDP {
     public KeyPress(KeyPress other) : this() {
       username_ = other.username_;
       key_ = other.key_;
+      status_ = other.status_;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -107,6 +108,17 @@ namespace GameDataUDP {
       }
     }
 
+    /// <summary>Field number for the "status" field.</summary>
+    public const int StatusFieldNumber = 3;
+    private string status_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Status {
+      get { return status_; }
+      set {
+        status_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as KeyPress);
@@ -122,6 +134,7 @@ namespace GameDataUDP {
       }
       if (Username != other.Username) return false;
       if (Key != other.Key) return false;
+      if (Status != other.Status) return false;
       return true;
     }
 
@@ -130,6 +143,7 @@ namespace GameDataUDP {
       int hash = 1;
       if (Username.Length != 0) hash ^= Username.GetHashCode();
       if (Key.Length != 0) hash ^= Key.GetHashCode();
+      if (Status.Length != 0) hash ^= Status.GetHashCode();
       return hash;
     }
 
@@ -148,6 +162,10 @@ namespace GameDataUDP {
         output.WriteRawTag(18);
         output.WriteString(Key);
       }
+      if (Status.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Status);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -158,6 +176,9 @@ namespace GameDataUDP {
       }
       if (Key.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
+      }
+      if (Status.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Status);
       }
       return size;
     }
@@ -172,6 +193,9 @@ namespace GameDataUDP {
       }
       if (other.Key.Length != 0) {
         Key = other.Key;
+      }
+      if (other.Status.Length != 0) {
+        Status = other.Status;
       }
     }
 
@@ -189,6 +213,10 @@ namespace GameDataUDP {
           }
           case 18: {
             Key = input.ReadString();
+            break;
+          }
+          case 26: {
+            Status = input.ReadString();
             break;
           }
         }

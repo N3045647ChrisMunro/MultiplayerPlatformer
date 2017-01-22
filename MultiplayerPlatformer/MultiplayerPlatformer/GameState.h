@@ -54,16 +54,6 @@ private:
 	void setupPlatforms();
 
 	void updatePosMessage();
-	std::queue<std::string> udpMsgSendQueue_;
-	std::queue<GameDataUDP::DataMessage *> udpMsgRecvQueue_;
-
-	std::string getSendMessage();
-	void addMsgToSendQueue(std::string msg);
-
-	GameDataUDP::DataMessage* getRecvMessage();
-	void addMsgToRecvQueue(GameDataUDP::DataMessage *dataMsg);
-
-	void spacePressed();
 
 private:
 
@@ -75,10 +65,8 @@ private:
 	//Network Variables
 	TCPNetwork *tcpNetwork_;
 	UDPNetwork udpNetwork_;
-	UDPMessenger *udpMessenger_{ nullptr };
-    
-    std::mutex threadMutex_;
-
+    UDPMessenger *udpMessenger_;
+    b2Vec2 vel_;
 
 	//Game Physics Variables
 	b2World *world_{ nullptr };

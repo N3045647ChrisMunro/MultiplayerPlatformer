@@ -16,9 +16,7 @@
 #include "GameDataTCP.pb.h"
 #include "GameDataUDP.pb.h"
 #include "google/protobuf/compiler/parser.h"
-
-//NetWork
-#include "UDPMessenger.h"
+#include "UDPMessenger.hpp"
 
 //Include Game Classes
 #include "Player.h"
@@ -26,6 +24,8 @@
 #include "Bullet.h"
 #include "Box.h"
 #include "Platform.h"
+
+
 
 #define PPM 30.f //Pixels per meter
 
@@ -52,20 +52,22 @@ bool GameState::createWorld()
 
 		const int MAX_ENEMIES = 10;
 		enemies_.clear();
-		enemies_.resize(MAX_ENEMIES);
+		/*enemies_.resize(MAX_ENEMIES);
 
 		for (unsigned int i = 0; i < enemies_.size(); i++) {
 			enemies_[i] = new Enemy();
 			enemies_[i]->createSprite(world_);
 		}
-
-
-		udpMessenger_ = new UDPMessenger();
-
-		udpNetwork_.setUDPMessenger(udpMessenger_);
+         */
+        
+        udpMessenger_ = new UDPMessenger();
+        
+        udpNetwork_.setUDPMessenger(udpMessenger_);
 		udpNetwork_.setIP_address("25.74.8.120");
 		udpNetwork_.setPortNumber(8081);
 		udpNetwork_.createSocket();
+        
+        player_->setUDPMessenger(udpMessenger_);
 
 		startClient();
 
@@ -121,7 +123,10 @@ void GameState::updateWorld()
 			}
 		}
 
-		if (player_->getPosition() != tempPos) {
+        const float diffX = fabsf(player_->getPosition().x - tempPos.x);
+        const float diffY = fabsf(player_->getPosition().y - tempPos.y);
+        
+		if (diffX > 1 || diffY > 1) {
 			updatePosMessage();
 
 			tempPos = player_->getPosition();
@@ -129,7 +134,8 @@ void GameState::updateWorld()
 
 		player_->setMousePosition(sf::Mouse::getPosition(*window_));
 		player_->update(event, deltaTime.asSeconds());
-
+        
+        
 		for (auto p : platforms_) {
 			window_->draw(*p);
 		}
@@ -137,8 +143,8 @@ void GameState::updateWorld()
 		if (enemies_.size() > 0) {
 			for (auto e : enemies_) {
 				if (e->isAlive()) {
+                    e->update(deltaTime.asSeconds());
 					window_->draw(*e);
-					e->update(deltaTime.asSeconds());
 				}
 			}
 		}
@@ -170,10 +176,16 @@ bool GameState::destroyWorld()
 
 		//Delete Gameplay Variabels
 		delete player_;
+        
+        delete udpMessenger_;
 
 		for (unsigned int i = 0; i < enemies_.size(); i++) {
 			delete enemies_[i];
 		}
+        
+        for(auto p : platforms_){
+            delete p;
+        }
 
 		delete tcpNetwork_;
 
@@ -190,12 +202,11 @@ bool GameState::destroyWorld()
 
 void GameState::recvTCPMessage()
 {
+    GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
+    dataMsg->Clear();
 	while (true)
 	{
 		if (tcpNetwork_->isConnected()) {
-
-			GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
-			dataMsg->Clear();
 
 			dataMsg = tcpNetwork_->receiveData();
 
@@ -211,9 +222,18 @@ void GameState::recvTCPMessage()
 
 						if (status == "NewReg") {
 							std::cout << "New Player Registered" << std::endl;
-
-							enemies_[enemiesIDXTracker_]->setAliveStatus(true);
-							enemies_[enemiesIDXTracker_]->setUserName(dataMsg->newplayerreg().Get(i).username());
+                            
+                            //Add a new enemy to the vector array
+                            Enemy *newEnemy = new Enemy();
+                            newEnemy->setAliveStatus(true);
+                            newEnemy->setUserName(dataMsg->newplayerreg().Get(i).username());
+                            newEnemy->setSpawnPos(sf::Vector2f(700, 400));
+                            newEnemy->createSprite(world_);
+                            enemies_.push_back(newEnemy);
+                        
+                            //delete newEnemy;
+							//enemies_[enemiesIDXTracker_]->setAliveStatus(true);
+							//enemies_[enemiesIDXTracker_]->setUserName(dataMsg->newplayerreg().Get(i).username());
 							enemiesIDXTracker_++;
                             enemyActiveCount_++;
 							dataMsg->Clear();
@@ -237,10 +257,8 @@ void GameState::recvUDPMessage()
 	while (true)
 	{
 		if (udpNetwork_.isConnected()) {
-            //GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
 
-			//dataMsg = udpNetwork_.receiveData();
-			//addMsgToRecvQueue(dataMsg);
+			udpNetwork_.receiveData();
 
 		}
 		else
@@ -262,21 +280,25 @@ void GameState::sendUDPMessage()
 
 void GameState::handleUDPMessage()
 {
+    GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+
 	while (true) {
-		GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
-
+        
+        if(dataMsg != NULL)
+            dataMsg->Clear();
+        
+        
 		std::string playerUserName = player_->getUsername();
-
+        std::string who = "";
 		dataMsg = udpMessenger_->getRecvMessage();
 		if (dataMsg != nullptr) {
-
+            
 			//check if the message is a POSITION UPDDATE
-
 			if (dataMsg->has_playerposupdate()) {
 
-				std::string who = dataMsg->playerposupdate().username();
+				who = dataMsg->playerposupdate().username();
                 
-				if (dataMsg->playerposupdate().username() != playerUserName) {
+				if (who != playerUserName) {
 
 					if (enemyActiveCount_ > 0) {
 
@@ -286,20 +308,43 @@ void GameState::handleUDPMessage()
                                 const float y = dataMsg->playerposupdate().ypos();
                                 e->setEnemyPos(sf::Vector2f(x, y));
                                 break;
-							}
+                            }
 						}
-
 					}
 
 				}
-				
-			}
-			if (dataMsg->has_playervelocityupdate()) {
-				//std::cout << dataMsg->playervelocityupdate().xpos() << ", " << dataMsg->playervelocityupdate().ypos() << std::endl;
-			}
 
-		}
-	}
+            }
+            //Check if the message is a VELOCITY UPDATE
+            if (dataMsg->has_playervelocityupdate()) {
+                
+                who = dataMsg->playervelocityupdate().username();
+                
+                if(who != playerUserName){
+                    
+                    std::cout << who << std::endl;
+                    
+                    if(enemyActiveCount_ > 0){
+                            
+                        for(auto e : enemies_){
+                                
+                            if(e->isAlive() && e->getUserName() == who){
+                                
+                                b2Vec2 vel;
+                                
+                                vel.x = dataMsg->playervelocityupdate().xpos();
+                                vel.y = dataMsg->playervelocityupdate().ypos();
+                                
+                                e->setEnemyVelocity(vel);
+                                break;
+                            }
+                            
+                        }
+                    }
+                }
+			}
+        }//end datamsg
+    }//end while
 }
 
 void GameState::startClient()
@@ -321,11 +366,16 @@ void GameState::startClient()
     #endif
     
 	tcpNetwork_->createSocket();
-	tcpNetwork_->connectToServer();
+    if(!tcpNetwork_->connectToServer()){
+        std::cout << "Invalid IP, Please Try again " << std::endl;
+        startClient();
+    }
 
 	GameDataTCP::DataMessage* dataMsg = new GameDataTCP::DataMessage();
 	GameDataTCP::Register* regData = new GameDataTCP::Register();
-	std::string name, pass;
+	GameDataTCP::Login* loginData = new GameDataTCP::Login();
+	std::string name, pass, encyrpted;
+	char key[] = { 'Q', 'B', 'Y' }; //Encyrption Key;
 	std::string status;
 
 	std::cout << "Hello, and Welcome To Chris Munro's super awesomely incredible unrivalled Multiplayer Platform Shooter" << std::endl;
@@ -354,7 +404,14 @@ void GameState::startClient()
 		player_->setUsername(name);
 
 		regData->set_username(name);
-		regData->set_password(pass);
+
+		std::cout << sizeof(char) << std::endl;
+
+		for (unsigned int i = 0; i < pass.size(); ++i) {
+			encyrpted += pass[i] ^ key[i % sizeof(key) / sizeof(char)];
+		}
+
+		regData->set_password(encyrpted);
 
 		dataMsg->set_allocated_register_(regData);
 
@@ -367,20 +424,30 @@ void GameState::startClient()
 		dataMsg = tcpNetwork_->receiveData();
 
 		//Handle the message
-		if (dataMsg->newplayerreg_size() > 0) {
+		if (dataMsg->newplayerreg_size() >= 0) {
 
 			//Check to see wether the registration was successful
 			status = dataMsg->newplayerreg().Get(0).status();
 
 			if (status == "Success") {
-				std::cout << "Registration Successful" << std::endl;
-
 				if (dataMsg->newplayerreg_size() > 1) {
 					for (unsigned int i = 1; i < dataMsg->newplayerreg_size(); i++) {
 						status = dataMsg->newplayerreg().Get(i).status();
 						if (status == "oldClients") {
-							enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
-							enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
+                            
+                            //Create a new enemy to add to the vector array
+                            Enemy *newEnemy = new Enemy();
+                            
+                            newEnemy->setAliveStatus(true);
+                            newEnemy->setUserName(dataMsg->newplayerreg().Get(i).username());
+                            newEnemy->setSpawnPos(sf::Vector2f(700, 400));
+                            newEnemy->createSprite(world_);
+                            enemies_.push_back(newEnemy);
+                            
+                            //delete newEnemy;
+                            
+							//enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
+							//enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
 							//enemies_[i - 1]->setEnemyPos(sf::Vector2f(300, 200));
 							enemyActiveCount_++;
 						}
@@ -396,14 +463,80 @@ void GameState::startClient()
 		break;
 	case '2':
 		std::cout << "login" << std::endl;
+		std::cout << "Username: ";
+		std::cin >> name;
+
+		std::cout << "Password: ";
+		std::cin >> pass;
+
+		std::cout << std::endl;
+		player_->setUsername(name);
+
+		loginData->set_username(name);
+
+		std::cout << sizeof(char) << std::endl;
+
+		for (unsigned int i = 0; i < pass.size(); ++i) {
+			encyrpted += pass[i] ^ key[i % sizeof(key) / sizeof(char)];
+		}
+
+		loginData->set_password(encyrpted);
+
+		dataMsg->set_allocated_login(loginData);
+
+		buff_string = dataMsg->SerializeAsString();
+
+		std::cout << buff_string << std::endl;
+
+		//Send a registration request to the server
+		tcpNetwork_->sendData(buff_string);
+		dataMsg = tcpNetwork_->receiveData();
+		
+		//Handle the message
+		if (dataMsg->newplayerreg_size() >= 0) {
+
+			//Check to see wether the registration was successful
+			status = dataMsg->newplayerreg().Get(0).status();
+
+			if (status == "Success") {
+				if (dataMsg->newplayerreg_size() > 1) {
+					for (unsigned int i = 1; i < dataMsg->newplayerreg_size(); i++) {
+						status = dataMsg->newplayerreg().Get(i).status();
+						if (status == "oldClients") {
+
+							//Create a new enemy to add to the vector array
+							Enemy *newEnemy = new Enemy();
+
+							newEnemy->setAliveStatus(true);
+							newEnemy->setUserName(dataMsg->newplayerreg().Get(i).username());
+							newEnemy->setSpawnPos(sf::Vector2f(700, 400));
+							newEnemy->createSprite(world_);
+							enemies_.push_back(newEnemy);
+
+							//delete newEnemy;
+
+							//enemies_[i - 1]->setAliveStatus(true); // - 1 so we start at the first index
+							//enemies_[i - 1]->setUserName(dataMsg->newplayerreg().Get(i).username());
+							//enemies_[i - 1]->setEnemyPos(sf::Vector2f(300, 200));
+							enemyActiveCount_++;
+						}
+					}
+				}
+			}
+			else if (status == "Failed") {
+				std::cout << "Sorry! Login Failed" << std::endl;
+				startClient();
+			}
+
+		}
 		break;
 	default:
 		std::cout << "Sorry, I dont understand that" << std::endl;
 		break;
 	}
 
-	//delete regData;
-	//delete dataMsg;
+	delete regData;
+	delete dataMsg;
 }
 
 void GameState::unReg()
@@ -419,6 +552,8 @@ void GameState::unReg()
 	std::string buffer = dataMsg->SerializeAsString();
 
 	tcpNetwork_->sendData(buffer);
+    
+    delete dataMsg;
 }
 
 void GameState::setupPlatforms()
@@ -466,7 +601,6 @@ void GameState::setupPlatforms()
 	rightTop->createPlatform(world_, b2Vec2(rightTopPos / PPM, 224.f / PPM), rightTopWidth / PPM, 32.f / PPM);
 
 	platforms_.push_back(rightTop);
-
 }
 
 void GameState::updatePosMessage()
@@ -482,72 +616,8 @@ void GameState::updatePosMessage()
 	std::string stringBuff = dataMsg->SerializeAsString();
 
 	udpMessenger_->addMsgToSendQueue(stringBuff);
-
-	//udpNetwork_.sendData(stringBuff);
-}
-
-std::string GameState::getSendMessage()
-{
-	if (udpMsgSendQueue_.size() > 0) {
-		threadMutex_.lock();
-
-		std::string message;
-		message = udpMsgSendQueue_.front();
-		udpMsgSendQueue_.pop();        
-		threadMutex_.unlock();
-
-		return message;
-	}
-	return "";
-}
-
-void GameState::addMsgToSendQueue(std::string msg)
-   {
-	threadMutex_.lock();
-
-	udpMsgSendQueue_.push(msg);       
-       
-	threadMutex_.unlock();
-}
-
-GameDataUDP::DataMessage* GameState::getRecvMessage()
-{
-	if (udpMsgRecvQueue_.size() > 0) {
-
-		threadMutex_.lock();
-
-		GameDataUDP::DataMessage *message = udpMsgRecvQueue_.front();
-		udpMsgRecvQueue_.pop();
-
-		threadMutex_.unlock();
-
-		return message;
-	}
-	return nullptr;
-}
-
-void GameState::addMsgToRecvQueue(GameDataUDP::DataMessage *dataMsg)
-{
-    threadMutex_.lock();
     
-	udpMsgRecvQueue_.push(dataMsg);
-
-	threadMutex_.unlock();
+    delete dataMsg;
 }
 
-void GameState::spacePressed()
-{
-	GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
-
-	GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
-
-	keyMsg->set_username(player_->getUsername());
-	keyMsg->set_key("Space");
-
-	dataMsg->set_allocated_keypress(keyMsg);
-
-	std::string stringBuff = dataMsg->SerializeAsString();
-
-	addMsgToSendQueue(stringBuff);
-}
 

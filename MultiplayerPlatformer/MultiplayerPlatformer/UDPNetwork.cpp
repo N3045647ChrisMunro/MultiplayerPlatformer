@@ -9,13 +9,14 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "UDPNetwork.h"
-#include "GameDataUDP.pb.h"
 #include <string>
 
 
 UDPNetwork::UDPNetwork()
 {
 	memset(recvBuff_, '0', sizeof(recvBuff_));
+    
+    dataMsg_ = new GameDataUDP::DataMessage();
 
 #ifdef __APPLE__
 
@@ -34,9 +35,10 @@ UDPNetwork::UDPNetwork()
 
 }
 
-
 UDPNetwork::~UDPNetwork()
 {
+    delete udpMessenger_;
+    delete dataMsg_;
 #ifdef  __APPLE__
 
 
@@ -69,9 +71,6 @@ void UDPNetwork::createSocket()
     
 	if (result < 0)
 		std::cerr << "Error: Failed to Create Socket" << std::endl;
-
-	//if(bind(socket_, (struct sockaddr *)&ser_addr_, sizeof(ser_addr_) ) < 0)
-	//    std::cerr << "Error: Failed to Bind the Socket" << std::endl;
 
 #elif _WIN32
 
@@ -106,13 +105,14 @@ void UDPNetwork::createSocket()
 #endif //  __APPLE__
 }
 
-GameDataUDP::DataMessage* UDPNetwork::receiveData()
+void UDPNetwork::receiveData()
 {
+    memset(recvBuff_, 0, sizeof(recvBuff_));
+    
 #ifdef __APPLE__
-
-	//std::cout << "Listening for UDP data...." << std::endl;
-
     GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+	//std::cout << "Listening for UDP data...." << std::endl;
+    dataMsg_->Clear();
     
 	//int s = recv(socket_, recvBuff_, sizeof(recvBuff_), 0);
     socklen_t size = sizeof(ser_addr_);
@@ -129,23 +129,20 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 
         if(dataMsg->ParseFromArray(newBuffer, s + 1)){
             std::cerr << "Error: Parse Failed (UDP)" << std::endl;
-            return nullptr;
         }else{
-            return dataMsg;
-            //std::cout << dataMsg->playerposupdate().username() << ", " << dataMsg->playerposupdate().xpos() << ", " << dataMsg->playerposupdate().ypos() << std::endl;
+            udpMessenger_->addMsgToRecvQueue(dataMsg);
+            delete[] newBuffer;
         }
 	}
-    return dataMsg;
 
 #elif _WIN32
 	if (socket_ > 0) {
-		std::cout << "Listeng for udp data..." << std::endl;
 
-		GameDataUDP::DataMessage* dataMsg = new GameDataUDP::DataMessage();
-
-		sockaddr_in *from;
 		int size = sizeof(recvAddr_);
 		int result = recvfrom(socket_, recvBuff_, sizeof(recvBuff_), 0, (sockaddr *)&recvAddr_, &size);
+
+		GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+		dataMsg->Clear();
 
 		if (result > 0) {
 			char *newBuffer = new char[result];
@@ -154,18 +151,15 @@ GameDataUDP::DataMessage* UDPNetwork::receiveData()
 
 			if (!dataMsg->ParseFromArray(newBuffer, result)) {
 				std::cout << "Error: Parse Failed (UDP)" << std::endl;
-				return nullptr;
 			}
+            else{
+                udpMessenger_->addMsgToRecvQueue(dataMsg_);
+                delete[] newBuffer;
+            }
 		}
 
 		if (result == SOCKET_ERROR)
 			std::cerr << "Error: UDP Recvfrom failed with error: " << WSAGetLastError() << std::endl;
-		else {
-			//std::cout << "Received UDP: " << socket_ << " BYTES" << std::endl;
-			//std::cout << "Received UDP: " << newBuffer << std::endl;
-			udpMessenger_->addMsgToRecvQueue(dataMsg);
-			return dataMsg;
-		}
 	}
 	else
 		std::cerr << "Error: UDP Connection Lost" << std::endl;
@@ -210,6 +204,11 @@ void UDPNetwork::sendData(std::string message)
 
 }
 
+void UDPNetwork::setUDPMessenger(UDPMessenger *messenger)
+{
+    udpMessenger_ = messenger;
+}
+
 void UDPNetwork::setIP_address(std::string ip)
 {
 	ip_ = ip;
@@ -237,9 +236,4 @@ bool UDPNetwork::isConnected() const
 	return false;
 
 #endif
-}
-
-void UDPNetwork::setUDPMessenger(UDPMessenger * messenger)
-{
-	udpMessenger_ = messenger;
 }

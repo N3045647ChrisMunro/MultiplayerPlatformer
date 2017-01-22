@@ -51,9 +51,10 @@ void protobuf_AssignDesc_GameDataUDP_2eproto() {
       "GameDataUDP.proto");
   GOOGLE_CHECK(file != NULL);
   KeyPress_descriptor_ = file->message_type(0);
-  static const int KeyPress_offsets_[2] = {
+  static const int KeyPress_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(KeyPress, username_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(KeyPress, key_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(KeyPress, status_),
   };
   KeyPress_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -204,22 +205,23 @@ void protobuf_AddDesc_GameDataUDP_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\021GameDataUDP.proto\022\013GameDataUDP\")\n\010KeyP"
-    "ress\022\020\n\010username\030\001 \001(\t\022\013\n\003key\030\002 \001(\t\"D\n\024P"
-    "layerPositionUpdate\022\020\n\010username\030\001 \001(\t\022\014\n"
-    "\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001(\002\"C\n\023PlayerVelci"
-    "tyUpdate\022\020\n\010username\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002"
-    "\022\014\n\004yPos\030\003 \001(\002\"A\n\024BulletPositionUpdate\022\r"
-    "\n\005owner\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001("
-    "\002\"4\n\017CollisionUpdate\022\021\n\tplayerHit\030\001 \001(\t\022"
-    "\016\n\006object\030\002 \001(\t\"\245\002\n\013DataMessage\022\'\n\010keyPr"
-    "ess\030\001 \001(\0132\025.GameDataUDP.KeyPress\022:\n\017play"
-    "erPosUpdate\030\002 \001(\0132!.GameDataUDP.PlayerPo"
-    "sitionUpdate\022>\n\024playerVelocityUpdate\030\003 \001"
-    "(\0132 .GameDataUDP.PlayerVelcityUpdate\022:\n\017"
-    "bulletPosUpdate\030\004 \001(\0132!.GameDataUDP.Bull"
-    "etPositionUpdate\0225\n\017collisionUpdate\030\005 \001("
-    "\0132\034.GameDataUDP.CollisionUpdateb\006proto3", 639);
+    "\n\021GameDataUDP.proto\022\013GameDataUDP\"9\n\010KeyP"
+    "ress\022\020\n\010username\030\001 \001(\t\022\013\n\003key\030\002 \001(\t\022\016\n\006s"
+    "tatus\030\003 \001(\t\"D\n\024PlayerPositionUpdate\022\020\n\010u"
+    "sername\030\001 \001(\t\022\014\n\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001("
+    "\002\"C\n\023PlayerVelcityUpdate\022\020\n\010username\030\001 \001"
+    "(\t\022\014\n\004xPos\030\002 \001(\002\022\014\n\004yPos\030\003 \001(\002\"A\n\024Bullet"
+    "PositionUpdate\022\r\n\005owner\030\001 \001(\t\022\014\n\004xPos\030\002 "
+    "\001(\002\022\014\n\004yPos\030\003 \001(\002\"4\n\017CollisionUpdate\022\021\n\t"
+    "playerHit\030\001 \001(\t\022\016\n\006object\030\002 \001(\t\"\245\002\n\013Data"
+    "Message\022\'\n\010keyPress\030\001 \001(\0132\025.GameDataUDP."
+    "KeyPress\022:\n\017playerPosUpdate\030\002 \001(\0132!.Game"
+    "DataUDP.PlayerPositionUpdate\022>\n\024playerVe"
+    "locityUpdate\030\003 \001(\0132 .GameDataUDP.PlayerV"
+    "elcityUpdate\022:\n\017bulletPosUpdate\030\004 \001(\0132!."
+    "GameDataUDP.BulletPositionUpdate\0225\n\017coll"
+    "isionUpdate\030\005 \001(\0132\034.GameDataUDP.Collisio"
+    "nUpdateb\006proto3", 655);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GameDataUDP.proto", &protobuf_RegisterTypes);
   KeyPress::default_instance_ = new KeyPress();
@@ -249,6 +251,7 @@ struct StaticDescriptorInitializer_GameDataUDP_2eproto {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int KeyPress::kUsernameFieldNumber;
 const int KeyPress::kKeyFieldNumber;
+const int KeyPress::kStatusFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 KeyPress::KeyPress()
@@ -275,6 +278,7 @@ void KeyPress::SharedCtor() {
   _cached_size_ = 0;
   username_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  status_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 KeyPress::~KeyPress() {
@@ -285,6 +289,7 @@ KeyPress::~KeyPress() {
 void KeyPress::SharedDtor() {
   username_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  status_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
@@ -318,6 +323,7 @@ void KeyPress::Clear() {
 // @@protoc_insertion_point(message_clear_start:GameDataUDP.KeyPress)
   username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  status_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 bool KeyPress::MergePartialFromCodedStream(
@@ -356,6 +362,23 @@ bool KeyPress::MergePartialFromCodedStream(
             this->key().data(), this->key().length(),
             ::google::protobuf::internal::WireFormatLite::PARSE,
             "GameDataUDP.KeyPress.key"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_status;
+        break;
+      }
+
+      // optional string status = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_status:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_status()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->status().data(), this->status().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "GameDataUDP.KeyPress.status"));
         } else {
           goto handle_unusual;
         }
@@ -407,6 +430,16 @@ void KeyPress::SerializeWithCachedSizes(
       2, this->key(), output);
   }
 
+  // optional string status = 3;
+  if (this->status().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->status().data(), this->status().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "GameDataUDP.KeyPress.status");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->status(), output);
+  }
+
   // @@protoc_insertion_point(serialize_end:GameDataUDP.KeyPress)
 }
 
@@ -435,6 +468,17 @@ void KeyPress::SerializeWithCachedSizes(
         2, this->key(), target);
   }
 
+  // optional string status = 3;
+  if (this->status().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->status().data(), this->status().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "GameDataUDP.KeyPress.status");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->status(), target);
+  }
+
   // @@protoc_insertion_point(serialize_to_array_end:GameDataUDP.KeyPress)
   return target;
 }
@@ -455,6 +499,13 @@ int KeyPress::ByteSize() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->key());
+  }
+
+  // optional string status = 3;
+  if (this->status().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->status());
   }
 
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
@@ -493,6 +544,10 @@ void KeyPress::MergeFrom(const KeyPress& from) {
 
     key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
   }
+  if (from.status().size() > 0) {
+
+    status_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.status_);
+  }
 }
 
 void KeyPress::CopyFrom(const ::google::protobuf::Message& from) {
@@ -521,6 +576,7 @@ void KeyPress::Swap(KeyPress* other) {
 void KeyPress::InternalSwap(KeyPress* other) {
   username_.Swap(&other->username_);
   key_.Swap(&other->key_);
+  status_.Swap(&other->status_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -622,6 +678,50 @@ void KeyPress::clear_key() {
   }
   key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
   // @@protoc_insertion_point(field_set_allocated:GameDataUDP.KeyPress.key)
+}
+
+// optional string status = 3;
+void KeyPress::clear_status() {
+  status_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& KeyPress::status() const {
+  // @@protoc_insertion_point(field_get:GameDataUDP.KeyPress.status)
+  return status_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void KeyPress::set_status(const ::std::string& value) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:GameDataUDP.KeyPress.status)
+}
+ void KeyPress::set_status(const char* value) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:GameDataUDP.KeyPress.status)
+}
+ void KeyPress::set_status(const char* value, size_t size) {
+  
+  status_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:GameDataUDP.KeyPress.status)
+}
+ ::std::string* KeyPress::mutable_status() {
+  
+  // @@protoc_insertion_point(field_mutable:GameDataUDP.KeyPress.status)
+  return status_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* KeyPress::release_status() {
+  // @@protoc_insertion_point(field_release:GameDataUDP.KeyPress.status)
+  
+  return status_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void KeyPress::set_allocated_status(::std::string* status) {
+  if (status != NULL) {
+    
+  } else {
+    
+  }
+  status_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), status);
+  // @@protoc_insertion_point(field_set_allocated:GameDataUDP.KeyPress.status)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

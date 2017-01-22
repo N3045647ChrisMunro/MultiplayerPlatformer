@@ -19,15 +19,14 @@ void Box::init(b2World* world, const b2Vec2 &position, const b2Vec2 &dimensions,
 	dimensions_.y = dimensions.y * PPM;
 
 	//Make the Body
-	b2BodyDef bodyDef;
-	bodyDef.position.Set(position.x, position.y);
+	bodyDef_.position.Set(position.x, position.y);
 
 	if (dynamic)
-		bodyDef.type = b2_dynamicBody;
+		bodyDef_.type = b2_dynamicBody;
 	else
-		bodyDef.type = b2_staticBody;
+		bodyDef_.type = b2_staticBody;
 
-	body_ = world->CreateBody(&bodyDef);
+	body_ = world->CreateBody(&bodyDef_);
 
 	b2PolygonShape boxShape;
 	boxShape.SetAsBox(dimensions.x / 2, dimensions.y / 2);

@@ -1,7 +1,2 @@
-﻿  Generating code
-d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\udpnetwork.cpp(154): warning C4715: 'UDPNetwork::receiveData': not all control paths return a value
-d:\university work\year 3\multiplayer and social\game\multiplayerplatformer\multiplayerplatformer\multiplayerplatformer\tcpnetwork.cpp(282): warning C4715: 'TCPNetwork::receiveData': not all control paths return a value
-  All 1282 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Release\MultiplayerPlatformer.exe
+﻿  MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Release\MultiplayerPlatformer.exe
   MultiplayerPlatformer.vcxproj -> D:\University Work\Year 3\Multiplayer and Social\Game\MultiplayerPlatformer\MultiplayerPlatformer\Release\MultiplayerPlatformer.pdb (Full PDB)

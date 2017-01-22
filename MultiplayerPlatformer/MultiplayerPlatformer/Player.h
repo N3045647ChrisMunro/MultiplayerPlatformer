@@ -7,6 +7,8 @@
 #include "Box.h"
 #include "Bullet.h"
 
+class UDPMessenger;
+
 class Player : public sf::Drawable
 {
 public:
@@ -36,12 +38,18 @@ public:
 	void setUsername(const std::string name);
 	std::string getUsername() const { return username_; }
 
+    void sendUDPVelocityMessage();
+    
+    void setUDPMessenger(UDPMessenger *messenger);
+    
 private:
 	
 	bool canJump_{ false };
 
 private:
 
+    UDPMessenger *udpMessenger_ { nullptr };
+    
 	std::string username_;
 	sf::Text usernameText_;
 
@@ -72,6 +80,7 @@ private:
 
 	float moveSpeed_{ 300.0f }; // Player Movement speed
 	b2Vec2 velocity_{ 0.f, 0.f }; //Player Velocity
+    b2Vec2 oldVelocity_{ 0.f, 0.f };
 	const int moveStep_{ 1 }; //Amount of pixels the player moves per key press
 	const float jumpHeight_{ 75.f }; //Amount of pixels the player jumps
 
@@ -97,6 +106,11 @@ private:
 
 	bool facingLeft_{ false };
 	bool facingRight_{ true };
+    
+    //Keypress Variables
+    bool wasRightPressed_{ false };
+    bool wasLeftPressed_{ false };
+    
 
 };
 

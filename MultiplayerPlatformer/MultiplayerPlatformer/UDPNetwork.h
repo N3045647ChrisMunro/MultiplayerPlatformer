@@ -3,7 +3,7 @@
 //  PlatformerGame
 //
 //  Created by MUNRO, CHRISTOPHER on 02/12/2016.
-//  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
+//  Copyright ï¿½ 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
 #pragma once
@@ -31,7 +31,8 @@
 
 #include <iostream>
 #include "GameDataUDP.pb.h"
-#include "UDPMessenger.h"
+
+#include "UDPMessenger.hpp"
 
 class UDPNetwork
 {
@@ -40,19 +41,21 @@ public:
 	~UDPNetwork();
 
 	void createSocket();
-	GameDataUDP::DataMessage* receiveData();
+	void receiveData();
 	void sendData(std::string message);
 
 	void setIP_address(std::string ip);
 	void setPortNumber(int port);
 
 	bool isConnected() const;
-	void setUDPMessenger(UDPMessenger *messenger);
+    
+    void setUDPMessenger(UDPMessenger *messenger);
 
 private:
 
-	UDPMessenger *udpMessenger_{nullptr};
-
+    UDPMessenger *udpMessenger_;
+    GameDataUDP::DataMessage* dataMsg_{ nullptr };
+    
 	std::string ip_;
 	int port_;
 

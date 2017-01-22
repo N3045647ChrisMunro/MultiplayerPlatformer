@@ -3,7 +3,12 @@
 #include <sstream>
 #include <math.h>
 
-#define PPM 30.f
+//Networking includes
+#include "UDPMessenger.hpp"
+#include "GameDataUDP.pb.h"
+
+
+#define PPM 30.f //Pixels Per Meter used to help with Box2D sizes compared to SFML
 
 Player::Player()
 {
@@ -13,6 +18,11 @@ Player::Player()
 Player::~Player()
 {
 	//dtor
+}
+
+void Player::setUDPMessenger(UDPMessenger *messenger)
+{
+    udpMessenger_ = messenger;
 }
 
 void Player::createSprite(b2World *world)
@@ -123,21 +133,59 @@ void Player::update(sf::Event event, float dt)
 	}
 	//Reset to defualt "standing" position
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::D) {
-		walkTileX_ = 3;
+        walkTileX_ = 3;
 		walkTileY_ = 1;
 
 		velocity_.x = 0;
+        /*
+        std::cout << "Apples" << std::endl;
+        
+        GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+        GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
+        
+        keyMsg->set_username(username_);
+        keyMsg->set_key("D");
+        keyMsg->set_status("Released");
+        
+        dataMsg->set_allocated_keypress(keyMsg);
+        
+        std::string message;
+        
+        message = dataMsg->SerializeAsString();
+        
+        udpMessenger_->addMsgToSendQueue(message);
+        delete dataMsg;
+         */
 	}
 	//Walk Left
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && walking_ == true) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && walking_ == true){
 		moveLeft(dt);
 	}
 	//Reset to defualt "standing" position
 	if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::A) {
-		walkTileX_ = 3;
+        
+        walkTileX_ = 3;
 		walkTileY_ = 1;
 
 		velocity_.x = 0;
+        /*std::cout << "Banana's" << std::endl;
+        
+        GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+        GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
+        
+        keyMsg->set_username(username_);
+        keyMsg->set_key("A");
+        keyMsg->set_status("Released");
+        
+        dataMsg->set_allocated_keypress(keyMsg);
+        
+        std::string message;
+        
+        message = dataMsg->SerializeAsString();
+        
+        udpMessenger_->addMsgToSendQueue(message);
+        delete dataMsg;
+         */
 	}
 	//Jump
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -184,7 +232,10 @@ void Player::update(sf::Event event, float dt)
 	if (walkTileY_ > 1) {
 		walkTileY_ = 0;
 	}
-	
+
+    
+    //1sendUDPVelocityMessage();
+    
 	//Update player velocity and positions
 	playerPos_.x = playerCollisionBox_.getBody()->GetPosition().x * PPM; //dt * velocity_.x;
 	playerPos_.y = playerCollisionBox_.getBody()->GetPosition().y * PPM; //dt * velocity_.y;
@@ -262,21 +313,6 @@ void Player::setIsJumping(bool state)
 void Player::setUsername(const std::string name)
 {
 	username_ = name;
-
-	//sf::Font font;
-	//if (!font.loadFromFile("Resources/sansation.ttf")) {
-	//	std::cerr << "Error: Failed to load font" << std::endl;
-	//}
-
-
-	//std::ostringstream ss;
-	//ss << username_; 
-	//usernameText_.setString(ss.str());
-	//usernameText_.setPosition(playerPos_.x, playerPos_.y + 25);
-	//usernameText_.setFont(font);
-	//usernameText_.setCharacterSize(20);
-	//usernameText_.setStyle(sf::Text::Bold);
-	//usernameText_.setFillColor(sf::Color::Blue);
 }
 
 void Player::moveRight(float deltaTime)
@@ -294,6 +330,34 @@ void Player::moveRight(float deltaTime)
 	pShield_.setScale({ 1.f, 1.f }); //Flip the Shield Sprite to face right
 
 	walkTileX_++;
+    /*
+    //Add A KeyPressUpdate Message to the messenger queue
+    GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+    GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
+    
+    keyMsg->set_username(username_);
+    keyMsg->set_key("D");
+    keyMsg->set_status("Pressed");
+    
+    dataMsg->set_allocated_keypress(keyMsg);
+    
+    //Add a position message to the message, this will the be starting point off new movement
+    GameDataUDP::PlayerPositionUpdate *posMsg = new GameDataUDP::PlayerPositionUpdate();
+    
+    posMsg->set_username(username_);
+    posMsg->set_xpos(playerPos_.x);
+    posMsg->set_xpos(playerPos_.y);
+    
+    dataMsg->set_allocated_playerposupdate(posMsg);
+    std::string message;
+    
+    message = dataMsg->SerializeAsString();
+    
+    udpMessenger_->addMsgToSendQueue(message);
+    
+    delete dataMsg;
+     */
+    
 }
 
 void Player::moveLeft(float deltaTime)
@@ -311,4 +375,63 @@ void Player::moveLeft(float deltaTime)
 	pShield_.setScale({ -1.f, 1.f }); //Flip the Shield Sprite to face left
 
 	walkTileX_++;
+    /*
+    //Add A KeyPressUpdate Message to the messenger queue
+    GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+    GameDataUDP::KeyPress *keyMsg = new GameDataUDP::KeyPress();
+    
+    keyMsg->set_username(username_);
+    keyMsg->set_key("A");
+    keyMsg->set_status("Pressed");
+    
+    dataMsg->set_allocated_keypress(keyMsg);
+    
+    //Add a position message to the message, this will the be starting point off new movement
+    GameDataUDP::PlayerPositionUpdate *posMsg = new GameDataUDP::PlayerPositionUpdate();
+    
+    posMsg->set_username(username_);
+    posMsg->set_xpos(playerPos_.x);
+    posMsg->set_xpos(playerPos_.y);
+    
+    dataMsg->set_allocated_playerposupdate(posMsg);
+    
+    std::string message;
+    
+    message = dataMsg->SerializeAsString();
+    
+    udpMessenger_->addMsgToSendQueue(message);
+    
+    //delete keyMsg;
+    delete dataMsg;
+    */
+}
+
+void Player::sendUDPVelocityMessage()
+{
+    if(oldVelocity_.x != velocity_.x || oldVelocity_.y != velocity_.x){
+        
+        oldVelocity_ = velocity_;
+        
+        GameDataUDP::DataMessage *dataMsg = new GameDataUDP::DataMessage();
+        GameDataUDP::PlayerVelcityUpdate *velMsg = new GameDataUDP::PlayerVelcityUpdate();
+        
+        velMsg->set_username(username_);
+        velMsg->set_xpos(oldVelocity_.x);
+        velMsg->set_ypos(oldVelocity_.y);
+        
+        dataMsg->set_allocated_playervelocityupdate(velMsg);
+        
+        std::string message;
+        message = dataMsg->SerializeAsString();
+        
+        udpMessenger_->addMsgToSendQueue(message);
+        
+        delete dataMsg;
+        
+        //std::cout << "Velocity Changed" << std::endl;
+        
+    }
+    else{
+        //std::cout << "No Velocity Change to send" << std::endl;
+    }
 }

@@ -3,7 +3,7 @@
 //  Multiplayer Platformer
 //
 //  Created by MUNRO, CHRISTOPHER on 04/11/2016.
-//  Copyright © 2016 MUNRO, CHRISTOPHER. All rights reserved.
+//  Copyright ï¿½ 2016 MUNRO, CHRISTOPHER. All rights reserved.
 //
 
 #pragma once
@@ -25,7 +25,8 @@ public:
 	const sf::Vector2f& getDimensions() const { return dimensions_; };
 
 private:
-
+    
+    b2BodyDef bodyDef_;
 	b2Body* body_{ nullptr };
 	b2Fixture* fixture_{ nullptr };
 
